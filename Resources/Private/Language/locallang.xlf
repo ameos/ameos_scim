@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<xliff version="1.0">
+    <file source-language="fr" datatype="plaintext" original="messages" date="2017-05-11T22:41:25Z">
+        <header/>
+        <body>
+            <trans-unit id="scim">
+                <source>Scim</source>
+            </trans-unit>
+            <trans-unit id="scim_external_id">
+                <source>External ID</source>
+            </trans-unit>
+            <trans-unit id="scim_id">
+                <source>Scim ID</source>
+            </trans-unit>
+        </body>
+    </file>
+</xliff>

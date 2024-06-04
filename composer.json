@@ -1,0 +1,31 @@
+{
+    "name": "ameos/scim",
+    "description": "SCIM Extension for TYPO3",
+    "type": "typo3-cms-extension",
+    "require": {
+        "typo3/cms-core": "^12.4 | dev-master",
+        "php": "^8.0",
+        "tmilos/scim-filter-parser": "^1.3"
+    },
+    "replace": {
+        "typo3-ter/scim": "self.version"
+    },
+    "license": "GPL-3.0-or-later",
+    "authors": [
+        {
+            "name": "Ameos Team",
+            "email": "typo3dev@ameos.com",
+            "homepage": "http://www.ameos.com/"
+        }
+    ],
+    "extra": {
+        "typo3/cms": {
+            "extension-key": "scim"
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Ameos\\Scim\\": "Classes"
+        }
+    }
+}

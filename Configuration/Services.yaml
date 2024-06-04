@@ -1,0 +1,29 @@
+services:
+  _defaults:
+    autowire: true
+    autoconfigure: true
+    public: false
+
+  Ameos\Scim\:
+    resource: '../Classes/*'
+
+  Ameos\Scim\Controller\Frontend\UserController:
+    public: true
+
+  Ameos\Scim\Controller\Frontend\GroupController:
+    public: true
+
+  Ameos\Scim\Controller\Backend\UserController:
+    public: true
+
+  Ameos\Scim\Controller\Backend\GroupController:
+    public: true
+
+  Ameos\Scim\Evaluator\GroupEvaluator:
+    public: true
+
+  Ameos\Scim\Evaluator\MultiValuedEvaluator:
+    public: true
+
+  Ameos\Scim\Evaluator\MemberEvaluator:
+    public: true
