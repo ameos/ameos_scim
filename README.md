@@ -1,10 +1,10 @@
 # SCIM Extension for TYPO3
 
-## Overview
+## Overview
 
 This TYPO3 extension provides an implementation of the System for Cross-domain Identity Management (SCIM) standard. SCIM is designed to simplify user management in cloud-based applications and services by providing a consistent way to manage user identities across various platforms.
 
-## Features
+## Features
 
  * User Provisioning: Automate user account creation, updates, and deletion.
  * Group Management: Manage user groups and memberships.
@@ -12,14 +12,14 @@ This TYPO3 extension provides an implementation of the System for Cross-domain I
  * Extensible: Easily extend and customize to fit specific needs.
  * Secure: Implements robust security measures to protect user data.
 
-## Requirements
+## Requirements
 
 TYPO3 v12 or higher
 PHP 8.0 or higher
 
-## Installation
+## Installation
 
-### Using Composer
+### Using Composer
 
 Add the extension to your TYPO3 project:
 
