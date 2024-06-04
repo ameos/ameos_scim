@@ -1,0 +1,4 @@
+mapping:
+  backend.group:
+    displayName:
+      mapOn: title

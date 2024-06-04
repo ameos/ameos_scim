@@ -1,0 +1,8 @@
+# cat=basic/enable; type=string; label=Bearer token value
+bearer = 
+
+# cat=basic/enable; type=string; label=Route for backend perimeter
+be_path = /scim/v2/backend/
+
+# cat=basic/enable; type=string; label=Route for frontend perimeter
+fe_path = /scim/v2/frontend/

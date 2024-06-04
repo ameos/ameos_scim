@@ -1,0 +1,6 @@
+mapping:
+  frontend.group:
+    displayName:
+      mapOn: title
+    members:
+      callback: Ameos\Scim\Evaluator\MemberEvaluator
