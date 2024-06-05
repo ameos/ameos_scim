@@ -80,10 +80,10 @@ abstract class AbstractResourceController
         );
 
         $configuration = [];
-        if (preg_match('/' . $baseRegex . '([a-zA-Z]*)\/?.*/', $request->getUri()->getPath(), $matches)) {
-            $mappingKey = match ($matches[1]) {
-                'Users' => $request->getAttribute('scim_context') === 'frontend' ? 'frontend.user' : 'backend.user',
-                'Groups' => $request->getAttribute('scim_context') === 'frontend' ? 'frontend.group' : 'backend.group',
+        if (preg_match('/' . $baseRegex . '([a-zA-Z]*)\/?.*/i', $request->getUri()->getPath(), $matches)) {
+            $mappingKey = match (mb_strtolower($matches[1])) {
+                'users' => $request->getAttribute('scim_context') === 'frontend' ? 'frontend.user' : 'backend.user',
+                'groups' => $request->getAttribute('scim_context') === 'frontend' ? 'frontend.group' : 'backend.group',
             };
 
             $yamlConfiguration = (new YamlFileLoader())->load($GLOBALS['TYPO3_CONF_VARS']['SCIM']['Configuration']);

@@ -48,8 +48,8 @@ class RoutingService
             $request->getAttribute('scim_context') === 'frontend' ? $config['fe_path'] : $config['be_path']
         );
 
-        $regexRoot = '/^' . $path . '(Users|Groups)\/?$/';
-        $regexUuid = '/^' . $path . '(Users|Groups)\/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})$/';
+        $regexRoot = '/^' . $path . '(Users|Groups)\/?$/i';
+        $regexUuid = '/^' . $path . '(Users|Groups)\/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})$/i';
 
         $response = null;
         if (
@@ -101,7 +101,7 @@ class RoutingService
         }
 
         if (
-            preg_match('/^' . $path . 'ResourceTypes$/', $request->getUri()->getPath())
+            preg_match('/^' . $path . 'ResourceTypes$/i', $request->getUri()->getPath())
             && $request->getMethod() === self::HTTP_GET
         ) {
             $response = GeneralUtility::makeInstance(ResourceTypeController::class)->indexAction($request);
@@ -109,8 +109,8 @@ class RoutingService
 
         if (
             (
-                preg_match('/^' . $path . 'ServiceProviderConfig$/', $request->getUri()->getPath())
-                || preg_match('/^' . $path . 'ServiceConfiguration$/', $request->getUri()->getPath())
+                preg_match('/^' . $path . 'ServiceProviderConfig$/i', $request->getUri()->getPath())
+                || preg_match('/^' . $path . 'ServiceConfiguration$/i', $request->getUri()->getPath())
             ) && $request->getMethod() === self::HTTP_GET
         ) {
             $response = GeneralUtility::makeInstance(ServiceProviderConfigController::class)->indexAction($request);
@@ -133,10 +133,10 @@ class RoutingService
     private function getControllerForSegment(string $segment, string $context): ?AbstractResourceController
     {
         $controller = null;
-        if ($segment === 'Users') {
+        if (mb_strtolower($segment) === 'users') {
             $fqcn = $context === 'frontend' ? FrontendUserController::class : BackendUserController::class;
             $controller = GeneralUtility::makeInstance($fqcn);
-        } elseif ($segment === 'Groups') {
+        } elseif (mb_strtolower($segment) === 'groups') {
             $fqcn = $context === 'frontend' ? FrontendGroupController::class : BackendGroupController::class;
             $controller = GeneralUtility::makeInstance($fqcn);
         }
