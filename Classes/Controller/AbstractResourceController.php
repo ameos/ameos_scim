@@ -83,9 +83,9 @@ abstract class AbstractResourceController
         $configuration = [];
         if (preg_match('/' . $baseRegex . '([a-zA-Z]*)\/?.*/i', $request->getUri()->getPath(), $matches)) {
             $mappingKey = match (mb_strtolower($matches[1])) {
-                'users' => $request->getAttribute('scim_context') === Context::Frontend 
+                'users' => $request->getAttribute('scim_context') === Context::Frontend
                     ? 'frontend.user' : 'backend.user',
-                'groups' => $request->getAttribute('scim_context') === Context::Frontend 
+                'groups' => $request->getAttribute('scim_context') === Context::Frontend
                     ? 'frontend.group' : 'backend.group',
             };
 

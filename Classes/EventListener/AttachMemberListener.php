@@ -22,7 +22,6 @@ final class AttachMemberListener
         private readonly FrontendUserRepository $frontendUserRepository,
         private readonly BackendUserRepository $backendUserRepository
     ) {
-        
     }
 
     /**
@@ -35,14 +34,13 @@ final class AttachMemberListener
     {
         foreach ($event->getMapping() as $property => $configuration) {
             if (isset($configuration['callback']) && $configuration['callback'] === MemberEvaluator::class) {
-
                 if (
                     $event->getMode() === PostPersistMode::Create || $event->getMode() === PostPersistMode::Update
                     && isset($event->getPayload()[$property])
                     && is_array($event->getPayload()[$property])
                 ) {
                     foreach ($event->getPayload()[$property] as $userPayload) {
-                        $repository = $event->getContext() === Context::Frontend 
+                        $repository = $event->getContext() === Context::Frontend
                             ? $this->frontendUserRepository : $this->backendUserRepository;
 
                         $user = $repository->read($userPayload['value']);
@@ -55,10 +53,9 @@ final class AttachMemberListener
                             }
                         }
                     }
-
                 }
 
-                // TODO : patch   
+                // TODO : patch
             }
         }
     }

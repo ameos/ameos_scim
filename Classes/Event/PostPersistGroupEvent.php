@@ -22,7 +22,8 @@ final class PostPersistGroupEvent
         private readonly array $record,
         private readonly PostPersistMode $mode,
         private readonly Context $context
-    ) {}
+    ) {
+    }
 
     /**
      * return mapping

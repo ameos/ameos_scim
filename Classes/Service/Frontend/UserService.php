@@ -43,7 +43,7 @@ class UserService
     public function search(array $queryParams, array $configuration): array
     {
         $attributes = isset($queryParams['attributes']) ? explode(',', $queryParams['attributes']) : [];
-        $excludedAttributes = isset($queryParams['excludedAttributes']) 
+        $excludedAttributes = isset($queryParams['excludedAttributes'])
             ? explode(',', $queryParams['excludedAttributes']) : [];
         $startIndex = isset($queryParams['startIndex']) ? (int)$queryParams['startIndex'] : 1;
         $itemsPerPage = isset($queryParams['itemsPerPage']) ? (int)$queryParams['itemsPerPage'] : 10;
@@ -89,7 +89,7 @@ class UserService
     public function read(string $userId, array $queryParams, array $configuration): array
     {
         $attributes = isset($queryParams['attributes']) ? explode(',', $queryParams['attributes']) : [];
-        $excludedAttributes = isset($queryParams['excludedAttributes']) 
+        $excludedAttributes = isset($queryParams['excludedAttributes'])
             ? explode(',', $queryParams['excludedAttributes']) : [];
         $user = $this->frontendUserRepository->read($userId);
 
@@ -193,8 +193,12 @@ class UserService
      * @param array $excludedAttributes
      * @return array
      */
-    public function dataToPayload(array $user, array $mapping, array $attributes = [], array $excludedAttributes = []): array
-    {
+    public function dataToPayload(
+        array $user,
+        array $mapping,
+        array $attributes = [],
+        array $excludedAttributes = []
+    ): array {
         /** @var NormalizedParams */
         $normalizedParams = $GLOBALS['TYPO3_REQUEST']->getAttribute('normalizedParams');
 

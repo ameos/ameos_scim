@@ -43,7 +43,7 @@ class GroupService
     public function search(array $queryParams, array $configuration): array
     {
         $attributes = isset($queryParams['attributes']) ? explode(',', $queryParams['attributes']) : [];
-        $excludedAttributes = isset($queryParams['excludedAttributes']) 
+        $excludedAttributes = isset($queryParams['excludedAttributes'])
             ? explode(',', $queryParams['excludedAttributes']) : [];
         $startIndex = isset($queryParams['startIndex']) ? (int)$queryParams['startIndex'] : 1;
         $itemsPerPage = isset($queryParams['itemsPerPage']) ? (int)$queryParams['itemsPerPage'] : 10;
@@ -89,7 +89,7 @@ class GroupService
     public function read(string $groupId, array $queryParams, array $configuration): array
     {
         $attributes = isset($queryParams['attributes']) ? explode(',', $queryParams['attributes']) : [];
-        $excludedAttributes = isset($queryParams['excludedAttributes']) 
+        $excludedAttributes = isset($queryParams['excludedAttributes'])
             ? explode(',', $queryParams['excludedAttributes']) : [];
         $group = $this->frontendGroupRepository->read($groupId);
 
