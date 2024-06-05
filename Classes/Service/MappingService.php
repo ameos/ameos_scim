@@ -20,7 +20,9 @@ class MappingService
     public function dataToPayload(array $data, array $mapping, array $attributes = []): array
     {
         $payload = [];
+        $attributes = array_map('mb_strtolower', $attributes);
         foreach ($mapping as $key => $configuration) {
+            $key = mb_strtolower($key);
             if (empty($attributes) || in_array($key, $attributes)) {
                 $item = [];
                 $root = &$item;
@@ -78,10 +80,12 @@ class MappingService
     {
         $data = [];
         foreach ($mapping as $key => $configuration) {
+            $key = mb_strtolower($key);
             $payloadValue = $payload;
 
             foreach (explode('.', $key) as $keyPart) {
                 if (is_array($payloadValue)) {
+                    $payloadValue = array_change_key_case($payloadValue);
                     $payloadValue = $payloadValue[$keyPart] ?? null;
                 }
             }
