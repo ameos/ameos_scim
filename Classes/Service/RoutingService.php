@@ -48,7 +48,7 @@ class RoutingService
             $request->getAttribute('scim_context') === 'frontend' ? $config['fe_path'] : $config['be_path']
         );
 
-        $regexRoot = '/^' . $path . '(Users|Groups)$/';
+        $regexRoot = '/^' . $path . '(Users|Groups)\/?$/';
         $regexUuid = '/^' . $path . '(Users|Groups)\/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})$/';
 
         $response = null;
