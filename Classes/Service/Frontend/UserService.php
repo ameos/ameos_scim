@@ -5,9 +5,13 @@ declare(strict_types=1);
 namespace Ameos\Scim\Service\Frontend;
 
 use Ameos\Scim\Domain\Repository\FrontendUserRepository;
+use Ameos\Scim\Enum\Context;
+use Ameos\Scim\Enum\PostPersistMode;
+use Ameos\Scim\Event\PostPersistUserEvent;
 use Ameos\Scim\Exception\NoResourceFoundException;
 use Ameos\Scim\Service\MappingService;
 use Ameos\Scim\Service\PatchService;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
 use TYPO3\CMS\Core\Http\NormalizedParams;
 
@@ -18,12 +22,14 @@ class UserService
      * @param PatchService $patchService
      * @param ExtensionConfiguration $extensionConfiguration
      * @param FrontendUserRepository $frontendUserRepository
+     * @param EventDispatcherInterface $eventDispatcher
      */
     public function __construct(
         private readonly MappingService $mappingService,
         private readonly PatchService $patchService,
         private readonly ExtensionConfiguration $extensionConfiguration,
-        private readonly FrontendUserRepository $frontendUserRepository
+        private readonly FrontendUserRepository $frontendUserRepository,
+        private readonly EventDispatcherInterface $eventDispatcher
     ) {
     }
 
@@ -95,8 +101,17 @@ class UserService
     public function create(array $payload, array $configuration): array
     {
         $data = $this->mappingService->payloadToData($payload, $configuration['mapping']);
-        $userId = $this->frontendUserRepository->create($data, (int)$configuration['pid']);
-        return $this->read($userId, [], $configuration);
+        $user = $this->frontendUserRepository->create($data, (int)$configuration['pid']);
+
+        $this->eventDispatcher->dispatch(new PostPersistUserEvent(
+            $configuration['mapping'],
+            $payload,
+            $user,
+            PostPersistMode::Create,
+            Context::Frontend
+        ));
+
+        return $this->read($user['scim_id'], [], $configuration);
     }
 
     /**
@@ -110,7 +125,16 @@ class UserService
     public function update(string $userId, array $payload, array $configuration): array
     {
         $data = $this->mappingService->payloadToData($payload, $configuration['mapping']);
-        $this->frontendUserRepository->update($userId, $data);
+        $data = $this->frontendUserRepository->update($userId, $data);
+
+        $this->eventDispatcher->dispatch(new PostPersistUserEvent(
+            $configuration['mapping'],
+            $payload,
+            $data,
+            PostPersistMode::Update,
+            Context::Frontend
+        ));
+
         return $this->read($userId, [], $configuration);
     }
 
@@ -127,7 +151,15 @@ class UserService
         $record = $this->frontendUserRepository->read($userId);
         $data = $this->patchService->apply($record, $payload, $configuration['mapping']);
         if (!empty($data)) {
-            $this->frontendUserRepository->update($userId, $data);
+            $data = $this->frontendUserRepository->update($userId, $data);
+
+            $this->eventDispatcher->dispatch(new PostPersistUserEvent(
+                $configuration['mapping'],
+                $payload,
+                $data,
+                PostPersistMode::Patch,
+                Context::Frontend
+            ));
         }
         return $this->read($userId, [], $configuration);
     }
@@ -156,7 +188,7 @@ class UserService
         /** @var NormalizedParams */
         $normalizedParams = $GLOBALS['TYPO3_REQUEST']->getAttribute('normalizedParams');
 
-        $data = $this->mappingService->dataToPayload($user, $mapping, $attributes);
+        $data = $this->mappingService->dataToPayload($user, $mapping, $attributes, Context::Frontend);
 
         $apiPath = $this->extensionConfiguration->get('scim', 'fe_path') . '/Users/';
 

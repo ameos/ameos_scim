@@ -11,6 +11,7 @@ use Ameos\Scim\Controller\Frontend\GroupController as FrontendGroupController;
 use Ameos\Scim\Controller\Frontend\UserController as FrontendUserController;
 use Ameos\Scim\Controller\ResourceTypeController;
 use Ameos\Scim\Controller\ServiceProviderConfigController;
+use Ameos\Scim\Enum\Context;
 use Ameos\Scim\Exception\RoutingFailedException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -45,7 +46,7 @@ class RoutingService
         $path = str_replace(
             '/',
             '\/',
-            $request->getAttribute('scim_context') === 'frontend' ? $config['fe_path'] : $config['be_path']
+            $request->getAttribute('scim_context') === Context::Frontend ? $config['fe_path'] : $config['be_path']
         );
 
         $regexRoot = '/^' . $path . '(Users|Groups)\/?$/i';
@@ -127,17 +128,17 @@ class RoutingService
      * return controller fqcn for corresponding to a URL segment
      *
      * @param string $segment
-     * @param string $context
+     * @param Context $context
      * @return AbstractResourceController
      */
-    private function getControllerForSegment(string $segment, string $context): ?AbstractResourceController
+    private function getControllerForSegment(string $segment, Context $context): ?AbstractResourceController
     {
         $controller = null;
         if (mb_strtolower($segment) === 'users') {
-            $fqcn = $context === 'frontend' ? FrontendUserController::class : BackendUserController::class;
+            $fqcn = $context === Context::Frontend ? FrontendUserController::class : BackendUserController::class;
             $controller = GeneralUtility::makeInstance($fqcn);
         } elseif (mb_strtolower($segment) === 'groups') {
-            $fqcn = $context === 'frontend' ? FrontendGroupController::class : BackendGroupController::class;
+            $fqcn = $context === Context::Frontend ? FrontendGroupController::class : BackendGroupController::class;
             $controller = GeneralUtility::makeInstance($fqcn);
         }
 

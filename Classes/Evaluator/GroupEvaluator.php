@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Ameos\Scim\Evaluator;
 
+use Ameos\Scim\Enum\Context;
 use Doctrine\DBAL\ArrayParameterType;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -19,8 +20,9 @@ class GroupEvaluator implements EvaluatorInterface
      *
      * @param array $data
      * @param array $configuration
+     * @param Context $context
      */
-    public function retrieveResourceData(array $data, array $configuration)
+    public function retrieveResourceData(array $data, array $configuration, Context $context)
     {
         // add $ref
         $usergroups = [];

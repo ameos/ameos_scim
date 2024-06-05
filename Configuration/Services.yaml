@@ -27,3 +27,8 @@ services:
 
   Ameos\Scim\Evaluator\MemberEvaluator:
     public: true
+
+  Ameos\Scim\EventListener\AttachMemberListener:
+    tags:
+      - name: event.listener
+        identifier: 'scim/attach-member'

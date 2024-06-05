@@ -112,9 +112,9 @@ abstract class AbstractResourceRepository
      *
      * @param array $data
      * @param int $pid
-     * @return string
+     * @return array
      */
-    public function create(array $data, int $pid): string
+    public function create(array $data, int $pid): array
     {
         $data['scim_id'] = UuidV6::generate();
         $data['crdate'] = time();
@@ -122,7 +122,8 @@ abstract class AbstractResourceRepository
         $data['pid'] = $pid;
         $connection = $this->connectionPool->getConnectionForTable($this->getTable());
         $connection->insert($this->getTable(), $data);
-        return $data['scim_id'];
+        $data['uid'] = (int)$connection->lastInsertId($this->getTable());
+        return $data;
     }
 
     /**
@@ -130,14 +131,14 @@ abstract class AbstractResourceRepository
      *
      * @param string $userId
      * @param array $data
-     * @return string
+     * @return array
      */
-    public function update(string $userId, array $data): string
+    public function update(string $userId, array $data): array
     {
         $data['tstamp'] = time();
         $connection = $this->connectionPool->getConnectionForTable($this->getTable());
         $connection->update($this->getTable(), $data, ['scim_id' => $userId]);
-        return $userId;
+        return $data;
     }
 
     /**

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Ameos\Scim\Evaluator;
 
+use Ameos\Scim\Enum\Context;
 use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 
@@ -18,17 +19,19 @@ class MemberEvaluator implements EvaluatorInterface
      *
      * @param array $data
      * @param array $configuration
+     * @param Context $context
      */
-    public function retrieveResourceData(array $data, array $configuration)
+    public function retrieveResourceData(array $data, array $configuration, Context $context)
     {
-        // add $ref
-        $qb = $this->connectionPool->getQueryBuilderForTable('fe_users');
+        // TODO add $ref
+        $table = $context === Context::Frontend ? 'fe_users' : 'be_users';
+        $qb = $this->connectionPool->getQueryBuilderForTable($table);
         $users = $qb
             ->select('*')
-            ->from('fe_users')
+            ->from($table)
             ->where(
                 $qb->expr()->inSet(
-                    'usergroup',
+                    $configuration['field'],
                     $qb->createNamedParameter((int)$data['uid'], Connection::PARAM_INT)
                 )
             )
@@ -50,6 +53,7 @@ class MemberEvaluator implements EvaluatorInterface
      */
     public function setResourceData(array $payload, array $data, array $configuration)
     {
+        // need group id, logic in post persist event with attach member listener
         return $data;
     }
 }

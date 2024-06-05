@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Ameos\Scim\Evaluator;
 
+use Ameos\Scim\Enum\Context;
+
 interface EvaluatorInterface
 {
     /**
@@ -11,8 +13,9 @@ interface EvaluatorInterface
      *
      * @param array $data
      * @param array $configuration
+     * @param Context $context
      */
-    public function retrieveResourceData(array $data, array $configuration);
+    public function retrieveResourceData(array $data, array $configuration, Context $context);
 
     /**
      * set resource data

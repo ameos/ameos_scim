@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Ameos\Scim\Controller;
 
+use Ameos\Scim\Enum\Context;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
@@ -76,21 +77,23 @@ abstract class AbstractResourceController
         $baseRegex = str_replace(
             '/',
             '\/',
-            $request->getAttribute('scim_context') === 'frontend' ? $config['fe_path'] : $config['be_path']
+            $request->getAttribute('scim_context') === Context::Frontend ? $config['fe_path'] : $config['be_path']
         );
 
         $configuration = [];
         if (preg_match('/' . $baseRegex . '([a-zA-Z]*)\/?.*/i', $request->getUri()->getPath(), $matches)) {
             $mappingKey = match (mb_strtolower($matches[1])) {
-                'users' => $request->getAttribute('scim_context') === 'frontend' ? 'frontend.user' : 'backend.user',
-                'groups' => $request->getAttribute('scim_context') === 'frontend' ? 'frontend.group' : 'backend.group',
+                'users' => $request->getAttribute('scim_context') === Context::Frontend 
+                    ? 'frontend.user' : 'backend.user',
+                'groups' => $request->getAttribute('scim_context') === Context::Frontend 
+                    ? 'frontend.group' : 'backend.group',
             };
 
             $yamlConfiguration = (new YamlFileLoader())->load($GLOBALS['TYPO3_CONF_VARS']['SCIM']['Configuration']);
             $configuration['mapping'] = $yamlConfiguration['mapping'][$mappingKey];
         }
 
-        if ($request->getAttribute('scim_context') === 'frontend') {
+        if ($request->getAttribute('scim_context') === Context::Frontend) {
             $typoscript = $request->getAttribute('frontend.typoscript')
                 ->getSetupArray()['plugin.']['tx_scim.']['settings.'] ?? [];
         }

@@ -2,3 +2,7 @@ mapping:
   backend.group:
     displayName:
       mapOn: title
+    members:
+      callback: Ameos\Scim\Evaluator\MemberEvaluator
+      arguments:
+        field: usergroup

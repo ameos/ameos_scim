@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Ameos\Scim\Service;
 
+use Ameos\Scim\Enum\Context;
 use Ameos\Scim\Evaluator\EvaluatorInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -15,10 +16,15 @@ class MappingService
      * @param array $data
      * @param array $mapping
      * @param array $attributes
+     * @param Context $context
      * @return array
      */
-    public function dataToPayload(array $data, array $mapping, array $attributes = []): array
-    {
+    public function dataToPayload(
+        array $data,
+        array $mapping,
+        array $attributes = [],
+        Context $context = Context::Frontend
+    ): array {
         $payload = [];
         $attributes = array_map('mb_strtolower', $attributes);
         foreach ($mapping as $key => $configuration) {
@@ -40,7 +46,7 @@ class MappingService
                 if (isset($configuration['callback'])) {
                     /** @var EvaluatorInterface */
                     $evaluator = GeneralUtility::makeInstance($configuration['callback']);
-                    $value = $evaluator->retrieveResourceData($data, $configuration['arguments'] ?? []);
+                    $value = $evaluator->retrieveResourceData($data, $configuration['arguments'] ?? [], $context);
                 }
 
                 if ($value !== null && isset($configuration['cast'])) {
