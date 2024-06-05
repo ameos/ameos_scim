@@ -14,6 +14,7 @@ use Tmilos\ScimFilterParser\Mode;
 use Tmilos\ScimFilterParser\Parser;
 use TYPO3\CMS\Core\Database\Query\Expression\CompositeExpression;
 use TYPO3\CMS\Core\Database\Query\QueryBuilder;
+use TYPO3\CMS\Core\Error\Http\BadRequestException as HttpBadRequestException;
 
 class FilterService
 {
@@ -76,6 +77,10 @@ class FilterService
     private function comparaison(ComparisonExpression $node, QueryBuilder $qb, array $mapping): string
     {
         $field = $this->mappingService->findField((string)$node->attributePath, $mapping);
+        if (!$field) {
+            throw new HttpBadRequestException('Filter not valid');
+        }
+
         return match ($node->operator) {
             'eq' => $qb->expr()->eq($field, $qb->createNamedParameter($node->compareValue)),
             'ne' => $qb->expr()->neq($field, $qb->createNamedParameter($node->compareValue)),

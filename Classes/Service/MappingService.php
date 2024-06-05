@@ -122,7 +122,7 @@ class MappingService
         $currentMapping = $mapping;
         foreach (explode('.', $property) as $propertyItem) {
             foreach ($currentMapping as $key => $value) {
-                if ($key === $propertyItem) {
+                if (mb_strtolower($key) === mb_strtolower($propertyItem)) {
                     if (isset($value['mapOn'])) {
                         return $value['mapOn'];
                     }
@@ -134,29 +134,5 @@ class MappingService
         }
 
         return false;
-    }
-
-    /**
-     * return property map on a field the mapping
-     *
-     * @param string $field
-     * @param array $mapping
-     * @return string|false
-     */
-    public function findProperty(string $field, array $mapping): string|false
-    {
-        foreach ($mapping as $key => $value) {
-            if (isset($value['mapOn']) && $field === $value['mapOn']) {
-                return $key;
-            } elseif (is_array($value) && !isset($value['mapOn'])) {
-                $temp = $this->findProperty($field, $value);
-
-                if ($temp) {
-                    return $key . '.' . $temp;
-                }
-            }
-        }
-
-        return null;
     }
 }
