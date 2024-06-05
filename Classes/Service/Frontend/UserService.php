@@ -7,6 +7,7 @@ namespace Ameos\Scim\Service\Frontend;
 use Ameos\Scim\Domain\Repository\FrontendUserRepository;
 use Ameos\Scim\Enum\Context;
 use Ameos\Scim\Enum\PostPersistMode;
+use Ameos\Scim\Event\PostDeleteUserEvent;
 use Ameos\Scim\Event\PostPersistUserEvent;
 use Ameos\Scim\Exception\NoResourceFoundException;
 use Ameos\Scim\Service\MappingService;
@@ -182,6 +183,7 @@ class UserService
     public function delete(string $userId): void
     {
         $this->frontendUserRepository->delete($userId);
+        $this->eventDispatcher->dispatch(new PostDeleteUserEvent($userId, Context::Frontend));
     }
 
     /**

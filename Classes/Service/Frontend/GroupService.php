@@ -7,6 +7,7 @@ namespace Ameos\Scim\Service\Frontend;
 use Ameos\Scim\Domain\Repository\FrontendGroupRepository;
 use Ameos\Scim\Enum\Context;
 use Ameos\Scim\Enum\PostPersistMode;
+use Ameos\Scim\Event\PostDeleteGroupEvent;
 use Ameos\Scim\Event\PostPersistGroupEvent;
 use Ameos\Scim\Exception\NoResourceFoundException;
 use Ameos\Scim\Service\MappingService;
@@ -182,6 +183,7 @@ class GroupService
     public function delete(string $groupId): void
     {
         $this->frontendGroupRepository->delete($groupId);
+        $this->eventDispatcher->dispatch(new PostDeleteGroupEvent($groupId, Context::Frontend));
     }
 
     /**
