@@ -1,6 +1,12 @@
 # cat=basic/enable; type=string; label=Bearer token value
 bearer = 
 
+# cat=basic/enable; type=boolean; label=Activate SCIM for backend
+be_activation = 1
+
+# cat=basic/enable; type=boolean; label=Activate SCIM for frontend
+fe_activation = 1
+
 # cat=basic/enable; type=string; label=Route for backend perimeter
 be_path = /scim/v2/backend/
 

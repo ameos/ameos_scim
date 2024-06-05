@@ -31,10 +31,16 @@ class ScimRequirementMiddleware implements MiddlewareInterface
     {
         $config = $this->extensionConfiguration->get('scim');
 
-        if (preg_match('/^' . str_replace('/', '\/', $config['be_path']) . '.*/', $request->getUri()->getPath())) {
+        if (
+            (bool)$config['be_activation'] === true
+            && preg_match('/^' . str_replace('/', '\/', $config['be_path']) . '.*/', $request->getUri()->getPath())
+        ) {
             $request = $this->enrichingRequest($request, 'backend');
         }
-        if (preg_match('/^' . str_replace('/', '\/', $config['fe_path']) . '.*/', $request->getUri()->getPath())) {
+        if (
+            (bool)$config['fe_activation'] === true
+            && preg_match('/^' . str_replace('/', '\/', $config['fe_path']) . '.*/', $request->getUri()->getPath())
+        ) {
             $request = $this->enrichingRequest($request, 'frontend');
         }
 
