@@ -43,6 +43,8 @@ class GroupService
     public function search(array $queryParams, array $configuration): array
     {
         $attributes = isset($queryParams['attributes']) ? explode(',', $queryParams['attributes']) : [];
+        $excludedAttributes = isset($queryParams['excludedAttributes']) 
+            ? explode(',', $queryParams['excludedAttributes']) : [];
         $startIndex = isset($queryParams['startIndex']) ? (int)$queryParams['startIndex'] : 1;
         $itemsPerPage = isset($queryParams['itemsPerPage']) ? (int)$queryParams['itemsPerPage'] : 10;
 
@@ -65,7 +67,12 @@ class GroupService
         ];
 
         while ($group = $result->fetchAssociative()) {
-            $payload['Resources'][] = $this->datatopayload($group, $configuration['mapping'], $attributes);
+            $payload['Resources'][] = $this->datatopayload(
+                $group,
+                $configuration['mapping'],
+                $attributes,
+                $excludedAttributes
+            );
         }
 
         return $payload;
@@ -82,13 +89,15 @@ class GroupService
     public function read(string $groupId, array $queryParams, array $configuration): array
     {
         $attributes = isset($queryParams['attributes']) ? explode(',', $queryParams['attributes']) : [];
+        $excludedAttributes = isset($queryParams['excludedAttributes']) 
+            ? explode(',', $queryParams['excludedAttributes']) : [];
         $group = $this->backendGroupRepository->read($groupId);
 
         if (!$group) {
             throw new NoResourceFoundException('Group not found');
         }
 
-        return $this->dataToPayload($group, $configuration['mapping'], $attributes);
+        return $this->dataToPayload($group, $configuration['mapping'], $attributes, $excludedAttributes);
     }
 
     /**
@@ -181,14 +190,25 @@ class GroupService
      * @param array $group
      * @param array $mapping
      * @param array $attributes
+     * @param array $excludedAttributes
      * @return array
      */
-    public function dataToPayload(array $group, array $mapping, array $attributes): array
-    {
+    public function dataToPayload(
+        array $group,
+        array $mapping,
+        array $attributes = [],
+        array $excludedAttributes = []
+    ): array {
         /** @var NormalizedParams */
         $normalizedParams = $GLOBALS['TYPO3_REQUEST']->getAttribute('normalizedParams');
 
-        $data = $this->mappingService->dataToPayload($group, $mapping, $attributes, Context::Backend);
+        $data = $this->mappingService->dataToPayload(
+            $group,
+            $mapping,
+            $attributes,
+            $excludedAttributes,
+            Context::Backend
+        );
 
         $apiPath = $this->extensionConfiguration->get('scim', 'be_path') . '/Groups/';
 

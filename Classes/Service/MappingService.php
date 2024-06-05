@@ -16,6 +16,7 @@ class MappingService
      * @param array $data
      * @param array $mapping
      * @param array $attributes
+     * @param array $excludedAttributes
      * @param Context $context
      * @return array
      */
@@ -23,13 +24,14 @@ class MappingService
         array $data,
         array $mapping,
         array $attributes = [],
+        array $excludedAttributes = [],
         Context $context = Context::Frontend
     ): array {
         $payload = [];
         $attributes = array_map('mb_strtolower', $attributes);
         foreach ($mapping as $key => $configuration) {
             $key = mb_strtolower($key);
-            if (empty($attributes) || in_array($key, $attributes)) {
+            if ((empty($attributes) || in_array($key, $attributes)) && !in_array($key, $excludedAttributes)) {
                 $item = [];
                 $root = &$item;
                 $keySplit = explode('.', $key);

@@ -43,6 +43,8 @@ class UserService
     public function search(array $queryParams, array $configuration): array
     {
         $attributes = isset($queryParams['attributes']) ? explode(',', $queryParams['attributes']) : [];
+        $excludedAttributes = isset($queryParams['excludedAttributes']) 
+            ? explode(',', $queryParams['excludedAttributes']) : [];
         $startIndex = isset($queryParams['startIndex']) ? (int)$queryParams['startIndex'] : 1;
         $itemsPerPage = isset($queryParams['itemsPerPage']) ? (int)$queryParams['itemsPerPage'] : 10;
 
@@ -65,7 +67,12 @@ class UserService
         ];
 
         while ($user = $result->fetchAssociative()) {
-            $payload['Resources'][] = $this->dataToPayload($user, $configuration['mapping'], $attributes);
+            $payload['Resources'][] = $this->dataToPayload(
+                $user,
+                $configuration['mapping'],
+                $attributes,
+                $excludedAttributes
+            );
         }
 
         return $payload;
@@ -82,13 +89,15 @@ class UserService
     public function read(string $userId, array $queryParams, array $configuration): array
     {
         $attributes = isset($queryParams['attributes']) ? explode(',', $queryParams['attributes']) : [];
+        $excludedAttributes = isset($queryParams['excludedAttributes']) 
+            ? explode(',', $queryParams['excludedAttributes']) : [];
         $user = $this->frontendUserRepository->read($userId);
 
         if (!$user) {
             throw new NoResourceFoundException('User not found');
         }
 
-        return $this->dataToPayload($user, $configuration['mapping'], $attributes);
+        return $this->dataToPayload($user, $configuration['mapping'], $attributes, $excludedAttributes);
     }
 
     /**
@@ -181,14 +190,21 @@ class UserService
      * @param array $user
      * @param array $mapping
      * @param array $attributes
+     * @param array $excludedAttributes
      * @return array
      */
-    public function dataToPayload(array $user, array $mapping, array $attributes): array
+    public function dataToPayload(array $user, array $mapping, array $attributes = [], array $excludedAttributes = []): array
     {
         /** @var NormalizedParams */
         $normalizedParams = $GLOBALS['TYPO3_REQUEST']->getAttribute('normalizedParams');
 
-        $data = $this->mappingService->dataToPayload($user, $mapping, $attributes, Context::Frontend);
+        $data = $this->mappingService->dataToPayload(
+            $user,
+            $mapping,
+            $attributes,
+            $excludedAttributes,
+            Context::Frontend
+        );
 
         $apiPath = $this->extensionConfiguration->get('scim', 'fe_path') . '/Users/';
 

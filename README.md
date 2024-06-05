@@ -19,7 +19,6 @@ This TYPO3 extension provides an implementation of the System for Cross-domain I
  * sub group management
  * bulk action
  * clean user after group delete
- * take into account excludedAttributes
  * ?
 
 ## Requirements
