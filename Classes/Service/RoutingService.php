@@ -108,8 +108,10 @@ class RoutingService
         }
 
         if (
-            preg_match('/^' . $path . 'ServiceProviderConfig$/', $request->getUri()->getPath())
-            && $request->getMethod() === self::HTTP_GET
+            (
+                preg_match('/^' . $path . 'ServiceProviderConfig$/', $request->getUri()->getPath())
+                || preg_match('/^' . $path . 'ServiceConfiguration$/', $request->getUri()->getPath())
+            ) && $request->getMethod() === self::HTTP_GET
         ) {
             $response = GeneralUtility::makeInstance(ServiceProviderConfigController::class)->indexAction($request);
         }
