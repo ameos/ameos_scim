@@ -12,6 +12,14 @@ This TYPO3 extension provides an implementation of the System for Cross-domain I
  * Extensible: Easily extend and customize to fit specific needs.
  * Secure: Implements robust security measures to protect user data.
 
+## TODO List
+
+ * Authentification
+ * $ref on members and group
+ * sub group management
+ * bulk action
+ * ?
+
 ## Requirements
 
 TYPO3 v12 or higher
