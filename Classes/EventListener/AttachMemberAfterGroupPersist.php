@@ -10,6 +10,7 @@ use Ameos\Scim\Enum\Context;
 use Ameos\Scim\Enum\PostPersistMode;
 use Ameos\Scim\Evaluator\MemberEvaluator;
 use Ameos\Scim\Event\PostPersistGroupEvent;
+use Ameos\Scim\Service\PatchService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 final class AttachMemberAfterGroupPersist
@@ -34,25 +35,50 @@ final class AttachMemberAfterGroupPersist
     {
         foreach ($event->getMapping() as $property => $configuration) {
             if (isset($configuration['callback']) && $configuration['callback'] === MemberEvaluator::class) {
+                $payload = array_change_key_case($event->getPayload());
+                $property = mb_strtolower($property);
+
                 if (
                     $event->getMode() === PostPersistMode::Create || $event->getMode() === PostPersistMode::Update
-                    && isset($event->getPayload()[$property])
-                    && is_array($event->getPayload()[$property])
+                    && isset($payload[$property])
+                    && is_array($payload[$property])
                 ) {
-                    foreach ($event->getPayload()[$property] as $userPayload) {
-                        $repository = $event->getContext() === Context::Frontend
-                            ? $this->frontendUserRepository : $this->backendUserRepository;
+                    $this->attachUsers($payload[$property], $configuration, $event);
+                }
 
-                        $user = $repository->read($userPayload['value']);
-                        if ($user) {
-                            $field = $configuration['arguments']['field'];
-                            $groups = array_filter(GeneralUtility::trimExplode(',', $user[$field]));
-                            if (!in_array((string)$event->getRecord()['uid'], $groups)) {
-                                $groups[] = $event->getRecord()['uid'];
-                                $repository->update($userPayload['value'], [$field => implode(',', $groups)]);
-                            }
+                if ($event->getMode() === PostPersistMode::Patch) {
+                    foreach ($payload['operations'] as $operation) {
+                        $operation = array_change_key_case($operation);
+                        if ($property === $operation['path'] && $operation['op'] === PatchService::OP_ADD) {
+                            $this->attachUsers($operation['value'], $configuration, $event);
                         }
                     }
+                }
+            }
+        }
+    }
+
+    /**
+     * attach users
+     *
+     * @param array $usersPayload
+     * @param array $configuration
+     * @param PostPersistGroupEvent $event
+     * @return void
+     */
+    private function attachUsers(array $usersPayload, array $configuration, PostPersistGroupEvent $event): void
+    {
+        foreach ($usersPayload as $userPayload) {
+            $repository = $event->getContext() === Context::Frontend
+                ? $this->frontendUserRepository : $this->backendUserRepository;
+
+            $user = $repository->read($userPayload['value']);
+            if ($user) {
+                $field = $configuration['arguments']['field'];
+                $groups = array_filter(GeneralUtility::trimExplode(',', $user[$field]));
+                if (!in_array((string)$event->getRecord()['uid'], $groups)) {
+                    $groups[] = $event->getRecord()['uid'];
+                    $repository->update($userPayload['value'], [$field => implode(',', $groups)]);
                 }
             }
         }

@@ -161,13 +161,13 @@ class GroupService
         $record = $this->frontendGroupRepository->read($groupId);
         $data = $this->patchService->apply($record, $payload, $configuration['mapping']);
         if (!empty($data)) {
-            $data = $this->frontendGroupRepository->update($groupId, $data);
+            $record = $this->frontendGroupRepository->update($groupId, $data);
         }
 
         $this->eventDispatcher->dispatch(new PostPersistGroupEvent(
             $configuration['mapping'],
             $payload,
-            $data,
+            $record,
             PostPersistMode::Patch,
             Context::Frontend
         ));

@@ -89,26 +89,26 @@ abstract class AbstractResourceRepository
     }
 
     /**
-     * detail an user
+     * detail a resource
      *
-     * @param string $userId
+     * @param string $resourceId
      * @param array $queryParams
      * @param array $configuration
      * @return array|false
      */
-    public function read(string $userId): array|false
+    public function read(string $resourceId): array|false
     {
         $qb = $this->connectionPool->getQueryBuilderForTable($this->getTable());
         return $qb
             ->select('*')
             ->from($this->getTable())
-            ->where($qb->expr()->eq('scim_id', $qb->createNamedParameter($userId)))
+            ->where($qb->expr()->eq('scim_id', $qb->createNamedParameter($resourceId)))
             ->executeQuery()
             ->fetchAssociative();
     }
 
     /**
-     * create an user
+     * create a resource
      *
      * @param array $data
      * @param int $pid
@@ -127,33 +127,33 @@ abstract class AbstractResourceRepository
     }
 
     /**
-     * update an user
+     * update a resource
      *
-     * @param string $userId
+     * @param string $resourceId
      * @param array $data
      * @return array
      */
-    public function update(string $userId, array $data): array
+    public function update(string $resourceId, array $data): array
     {
         $data['tstamp'] = time();
         $connection = $this->connectionPool->getConnectionForTable($this->getTable());
-        $connection->update($this->getTable(), $data, ['scim_id' => $userId]);
-        return $data;
+        $connection->update($this->getTable(), $data, ['scim_id' => $resourceId]);
+        return $this->read($resourceId);
     }
 
     /**
-     * delete  an user
+     * delete a resource
      *
-     * @param string $userId
+     * @param string $resourceId
      * @return void
      */
-    public function delete(string $userId): void
+    public function delete(string $resourceId): void
     {
         $qb = $this->connectionPool->getQueryBuilderForTable($this->getTable());
         $qb
             ->update($this->getTable())
             ->set('deleted', 1, true, Connection::PARAM_INT)
-            ->where($qb->expr()->eq('scim_id', $qb->createNamedParameter($userId)))
+            ->where($qb->expr()->eq('scim_id', $qb->createNamedParameter($resourceId)))
             ->executeStatement();
     }
 }

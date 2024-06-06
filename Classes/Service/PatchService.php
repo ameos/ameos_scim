@@ -8,6 +8,13 @@ use Ameos\Scim\Exception\PatchTestErrorException;
 
 class PatchService
 {
+    public const OP_ADD = 'add';
+    public const OP_REMOVE = 'remove';
+    public const OP_REPLACE = 'replace';
+    public const OP_MOVE = 'move';
+    public const OP_COPY = 'copy';
+    public const OP_TEST = 'test';
+
     /**
      * @param MappingService $mappingService
      */
@@ -27,14 +34,15 @@ class PatchService
     {
         $original = $record;
 
-        foreach ($payload['Operations'] as $operation) {
+        $payload = array_change_key_case($payload);
+        foreach ($payload['operations'] as $operation) {
             $record = match ($operation['op']) {
-                'add' => $this->add($record, $operation, $mapping),
-                'remove' => $this->remove($record, $operation, $mapping),
-                'replace' => $this->replace($record, $operation, $mapping),
-                'move' => $this->move($record, $operation, $mapping),
-                'copy' => $this->copy($record, $operation, $mapping),
-                'test' => $this->test($record, $operation, $mapping),
+                self::OP_ADD => $this->add($record, $operation, $mapping),
+                self::OP_REMOVE => $this->remove($record, $operation, $mapping),
+                self::OP_REPLACE => $this->replace($record, $operation, $mapping),
+                self::OP_MOVE => $this->move($record, $operation, $mapping),
+                self::OP_COPY => $this->copy($record, $operation, $mapping),
+                self::OP_TEST => $this->test($record, $operation, $mapping),
             };
         }
 
