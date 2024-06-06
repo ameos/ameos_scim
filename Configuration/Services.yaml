@@ -28,7 +28,12 @@ services:
   Ameos\Scim\Evaluator\MemberEvaluator:
     public: true
 
-  Ameos\Scim\EventListener\AttachMemberListener:
+  Ameos\Scim\EventListener\AttachMemberAfterGroupPersist:
     tags:
       - name: event.listener
         identifier: 'scim/attach-member'
+
+  Ameos\Scim\EventListener\CleanUserAfterGroupRemoved:
+    tags:
+      - name: event.listener
+        identifier: 'scim/clean-user'

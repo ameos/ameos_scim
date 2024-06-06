@@ -267,7 +267,7 @@ class GroupController extends AbstractResourceController
     {
         try {
             $this->logger->info('Delete group ' . $resourceId);
-            $this->groupService->delete($resourceId);
+            $this->groupService->delete($resourceId, $this->getConfiguration($request));
             return new HtmlResponse('', 204);
         } catch (\Exception $e) {
             $this->logger->error('Error during group delete ' . $e->getMessage());

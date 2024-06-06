@@ -162,15 +162,16 @@ class GroupService
         $data = $this->patchService->apply($record, $payload, $configuration['mapping']);
         if (!empty($data)) {
             $data = $this->frontendGroupRepository->update($groupId, $data);
-
-            $this->eventDispatcher->dispatch(new PostPersistGroupEvent(
-                $configuration['mapping'],
-                $payload,
-                $data,
-                PostPersistMode::Patch,
-                Context::Frontend
-            ));
         }
+
+        $this->eventDispatcher->dispatch(new PostPersistGroupEvent(
+            $configuration['mapping'],
+            $payload,
+            $data,
+            PostPersistMode::Patch,
+            Context::Frontend
+        ));
+
         return $this->read($groupId, [], $configuration);
     }
 
@@ -178,12 +179,17 @@ class GroupService
      * delete  an group
      *
      * @param string $groupId
+     * @param array $configuration
      * @return array
      */
-    public function delete(string $groupId): void
+    public function delete(string $groupId, array $configuration): void
     {
         $this->frontendGroupRepository->delete($groupId);
-        $this->eventDispatcher->dispatch(new PostDeleteGroupEvent($groupId, Context::Frontend));
+        $this->eventDispatcher->dispatch(new PostDeleteGroupEvent(
+            $groupId,
+            $configuration['mapping'],
+            Context::Frontend
+        ));
     }
 
     /**

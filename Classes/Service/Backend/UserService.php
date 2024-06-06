@@ -162,15 +162,16 @@ class UserService
         $data = $this->patchService->apply($record, $payload, $configuration['mapping']);
         if (!empty($data)) {
             $data = $this->backendUserRepository->update($userId, $data);
-
-            $this->eventDispatcher->dispatch(new PostPersistUserEvent(
-                $configuration['mapping'],
-                $payload,
-                $data,
-                PostPersistMode::Patch,
-                Context::Backend
-            ));
         }
+
+        $this->eventDispatcher->dispatch(new PostPersistUserEvent(
+            $configuration['mapping'],
+            $payload,
+            $data,
+            PostPersistMode::Patch,
+            Context::Backend
+        ));
+
         return $this->read($userId, [], $configuration);
     }
 
@@ -178,12 +179,17 @@ class UserService
      * delete  an user
      *
      * @param string $userId
+     * @param array $configuration
      * @return array
      */
-    public function delete(string $userId): void
+    public function delete(string $userId, array $configuration): void
     {
         $this->backendUserRepository->delete($userId);
-        $this->eventDispatcher->dispatch(new PostDeleteUserEvent($userId, Context::Backend));
+        $this->eventDispatcher->dispatch(new PostDeleteUserEvent(
+            $userId,
+            $configuration['mapping'],
+            Context::Backend
+        ));
     }
 
     /**

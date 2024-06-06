@@ -12,7 +12,7 @@ use Ameos\Scim\Evaluator\MemberEvaluator;
 use Ameos\Scim\Event\PostPersistGroupEvent;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
-final class AttachMemberListener
+final class AttachMemberAfterGroupPersist
 {
     /**
      * @param FrontendUserRepository $frontendUserRepository
@@ -54,8 +54,6 @@ final class AttachMemberListener
                         }
                     }
                 }
-
-                // TODO : patch
             }
         }
     }

@@ -10,10 +10,12 @@ final class PostDeleteGroupEvent
 {
     /**
      * @param string $recordId
+     * @param array $mapping
      * @param Context $context
      */
     public function __construct(
         private readonly string $recordId,
+        private readonly array $mapping,
         private readonly Context $context
     ) {
     }
@@ -26,6 +28,16 @@ final class PostDeleteGroupEvent
     public function getRecordId(): string
     {
         return $this->recordId;
+    }
+
+    /**
+     * return mapping
+     *
+     * @return array
+     */
+    public function getMapping(): array
+    {
+        return $this->mapping;
     }
 
     /**

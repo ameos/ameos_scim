@@ -51,10 +51,12 @@ class PatchService
      */
     private function add(array $record, array $operation, array $mapping): array
     {
-        $path = trim(str_replace('/', '.', $operation['path'], '/'));
+        $path = trim(str_replace('/', '.', $operation['path']), '/');
         $field = $this->mappingService->findField($path, $mapping);
 
-        $record[$field] = $operation['value'];
+        if (!isset($mapping[$operation['path']]['callback'])) {
+            $record[$field] = $operation['value'];
+        }
 
         return $record;
     }
@@ -69,7 +71,7 @@ class PatchService
      */
     private function remove(array $record, array $operation, array $mapping): array
     {
-        $path = trim(str_replace('/', '.', $operation['path'], '/'));
+        $path = trim(str_replace('/', '.', $operation['path']), '/');
         $field = $this->mappingService->findField($path, $mapping);
 
         $record[$field] = $operation['value'];
@@ -87,7 +89,7 @@ class PatchService
      */
     private function replace(array $record, array $operation, array $mapping): array
     {
-        $path = trim(str_replace('/', '.', $operation['path'], '/'));
+        $path = trim(str_replace('/', '.', $operation['path']), '/');
         $field = $this->mappingService->findField($path, $mapping);
 
         $record[$field] = $operation['value'];
@@ -105,8 +107,8 @@ class PatchService
      */
     private function move(array $record, array $operation, array $mapping): array
     {
-        $from = trim(str_replace('/', '.', $operation['from'], '/'));
-        $path = trim(str_replace('/', '.', $operation['path'], '/'));
+        $from = trim(str_replace('/', '.', $operation['from']), '/');
+        $path = trim(str_replace('/', '.', $operation['path']), '/');
         $fromField = $this->mappingService->findField($from, $mapping);
         $pathField = $this->mappingService->findField($path, $mapping);
 
@@ -126,8 +128,8 @@ class PatchService
      */
     private function copy(array $record, array $operation, array $mapping): array
     {
-        $from = trim(str_replace('/', '.', $operation['from'], '/'));
-        $path = trim(str_replace('/', '.', $operation['path'], '/'));
+        $from = trim(str_replace('/', '.', $operation['from']), '/');
+        $path = trim(str_replace('/', '.', $operation['path']), '/');
         $fromField = $this->mappingService->findField($from, $mapping);
         $pathField = $this->mappingService->findField($path, $mapping);
 
@@ -146,7 +148,7 @@ class PatchService
      */
     private function test(array $record, array $operation, array $mapping): array
     {
-        $path = trim(str_replace('/', '.', $operation['path'], '/'));
+        $path = trim(str_replace('/', '.', $operation['path']), '/');
         $field = $this->mappingService->findField($path, $mapping);
 
         if ($record[$field] !== $operation['value']) {

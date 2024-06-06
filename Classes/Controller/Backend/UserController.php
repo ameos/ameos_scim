@@ -267,7 +267,7 @@ class UserController extends AbstractResourceController
     {
         try {
             $this->logger->info('Delete user ' . $resourceId);
-            $this->userService->delete($resourceId);
+            $this->userService->delete($resourceId, $this->getConfiguration($request));
             return new HtmlResponse('', 204);
         } catch (\Exception $e) {
             $this->logger->error('Error during user delete ' . $e->getMessage());

@@ -20,7 +20,7 @@ abstract class AbstractResourceRepository
     public function __construct(
         private readonly MappingService $mappingService,
         private readonly FilterService $filterService,
-        private readonly ConnectionPool $connectionPool
+        protected readonly ConnectionPool $connectionPool
     ) {
     }
 
