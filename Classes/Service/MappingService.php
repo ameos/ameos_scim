@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Ameos\Scim\Service;
 
+use Ameos\Scim\CustomObject\CustomObjectInterface;
 use Ameos\Scim\Enum\Context;
-use Ameos\Scim\Evaluator\EvaluatorInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class MappingService
@@ -45,10 +45,10 @@ class MappingService
                     $value = $data[$configuration['mapOn']];
                 }
 
-                if (isset($configuration['callback'])) {
+                if (isset($configuration['object'])) {
                     /** @var EvaluatorInterface */
-                    $evaluator = GeneralUtility::makeInstance($configuration['callback']);
-                    $value = $evaluator->retrieveResourceData($data, $configuration['arguments'] ?? [], $context);
+                    $customObject = GeneralUtility::makeInstance($configuration['object']);
+                    $value = $customObject->read($data, $configuration['arguments'] ?? [], $context);
                 }
 
                 if ($value !== null && isset($configuration['cast'])) {
@@ -107,10 +107,10 @@ class MappingService
                     $data[$configuration['mapOn']] = $payloadValue;
                 }
 
-                if (isset($configuration['callback']) && isset($payload[$key])) {
-                    /** @var EvaluatorInterface */
-                    $evaluator = GeneralUtility::makeInstance($configuration['callback']);
-                    $data = $evaluator->setResourceData($payload[$key], $data, $configuration['arguments'] ?? []);
+                if (isset($configuration['object']) && isset($payload[$key])) {
+                    /** @var CustomObjectInterface */
+                    $customObject = GeneralUtility::makeInstance($configuration['object']);
+                    $data = $customObject->write($payload[$key], $data, $configuration['arguments'] ?? []);
                 }
             }
         }
@@ -127,11 +127,15 @@ class MappingService
      */
     public function findPropertyConfiguration(string $property, array $mapping): array|false
     {
+        if (preg_match('/([^\[]*)\[([^\]]*)\]/', $property, $matches)) {
+            $property = $matches[1];
+        }
+
         $currentMapping = $mapping;
         foreach (explode('.', $property) as $propertyItem) {
             foreach ($currentMapping as $key => $value) {
                 if (mb_strtolower($key) === mb_strtolower($propertyItem)) {
-                    if (isset($value['mapOn'])) {
+                    if (isset($value['mapOn']) || isset($value['object'])) {
                         return $value;
                     }
 
@@ -149,29 +153,31 @@ class MappingService
      *
      * @param string $property
      * @param array $mapping
-     * @return string|false
+     * @return array|false
      */
-    public function findField(string $property, array $mapping, ): string|false
+    public function findFieldsCorrespondingProperty(string $property, array $mapping): array|false
     {
+        $filter = null;
+        if (preg_match('/([^\[]*)\[([^\]]*)\]/', $property, $matches)) {
+            $property = $matches[1];
+            $filter = $matches[2];
+        }
+
         $currentMapping = $mapping;
         foreach (explode('.', $property) as $propertyItem) {
-            foreach ($currentMapping as $key => $value) {
+            foreach ($currentMapping as $key => $configuration) {
                 if (mb_strtolower($key) === mb_strtolower($propertyItem)) {
-                    if (isset($value['mapOn'])) {
-                        return $value['mapOn'];
+                    if (isset($configuration['mapOn'])) {
+                        return [$configuration['mapOn']];
                     }
 
-                    /*                    
-                    if (isset($value['callback'])) {
-                        $evaluator = GeneralUtility::makeInstance($value['callback']);
-                        $fields = $evaluator->getFields($value);
-                        if ($fields) {
-                            return $fields;
-                        }
+                    if (isset($configuration['object'])) {
+                        /** @var CustomObjectInterface */
+                        $customObject = GeneralUtility::makeInstance($configuration['object']);
+                        return $customObject->getAssociateFields($configuration, $filter);
                     }
-                    */
 
-                    $currentMapping = $value;
+                    $currentMapping = $configuration;
                     break;
                 }
             }

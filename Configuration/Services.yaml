@@ -19,13 +19,13 @@ services:
   Ameos\Scim\Controller\Backend\GroupController:
     public: true
 
-  Ameos\Scim\Evaluator\GroupEvaluator:
+  Ameos\Scim\CustomObject\GroupObject:
     public: true
 
-  Ameos\Scim\Evaluator\MultiValuedEvaluator:
+  Ameos\Scim\CustomObject\MultiValuedObject:
     public: true
 
-  Ameos\Scim\Evaluator\MemberEvaluator:
+  Ameos\Scim\CustomObject\MemberObject:
     public: true
 
   Ameos\Scim\EventListener\ProcessMembersAfterGroupPersist:

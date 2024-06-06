@@ -55,9 +55,9 @@ class FilterService
      * @param Node $node
      * @param QueryBuilder $qb
      * @param array $mapping
-     * @return CompositeExpression|string
+     * @return CompositeExpression
      */
-    private function convertNode(Node $node, QueryBuilder $qb, array $mapping): CompositeExpression|string
+    private function convertNode(Node $node, QueryBuilder $qb, array $mapping): CompositeExpression
     {
         return match (get_class($node)) {
             ComparisonExpression::class => $this->comparaison($node, $qb, $mapping),
@@ -72,29 +72,33 @@ class FilterService
      * @param ComparisonExpression $node
      * @param QueryBuilder $qb
      * @param array $mapping
-     * @return string
+     * @return CompositeExpression
      */
-    private function comparaison(ComparisonExpression $node, QueryBuilder $qb, array $mapping): string
+    private function comparaison(ComparisonExpression $node, QueryBuilder $qb, array $mapping): CompositeExpression
     {
-        $field = (string)$node->attributePath === 'id'
-            ? ['scim_id'] : $this->mappingService->findField((string)$node->attributePath, $mapping);
+        $fields = ['scim_id'];
+        if ((string)$node->attributePath !== 'id') {
+            $fields = $this->mappingService->findFieldsCorrespondingProperty((string)$node->attributePath, $mapping);
+        }
 
-        if (!$field) {
+        if (!$fields) {
             throw new HttpBadRequestException('Filter not valid');
         }
 
-        return match ($node->operator) {
-            'eq' => $qb->expr()->eq($field, $qb->createNamedParameter($node->compareValue)),
-            'ne' => $qb->expr()->neq($field, $qb->createNamedParameter($node->compareValue)),
-            'co' => $qb->expr()->like($field, $qb->createNamedParameter('%' . $node->compareValue . '%')),
-            'sw' => $qb->expr()->like($field, $qb->createNamedParameter($node->compareValue . '%')),
-            'ew' => $qb->expr()->like($field, $qb->createNamedParameter('%' . $node->compareValue)),
-            'pr' => $qb->expr()->notLike($field, $qb->createNamedParameter('')),
-            'gt' => $qb->expr()->gt($field, $qb->createNamedParameter($node->compareValue)),
-            'ge' => $qb->expr()->gte($field, $qb->createNamedParameter($node->compareValue)),
-            'lt' => $qb->expr()->lt($field, $qb->createNamedParameter($node->compareValue)),
-            'le' => $qb->expr()->lte($field, $qb->createNamedParameter($node->compareValue))
+        $v = $node->compareValue;
+        $comparisons = match ($node->operator) {
+            'eq' => array_map(fn ($f) => $qb->expr()->eq($f, $qb->createNamedParameter($v)), $fields),
+            'ne' => array_map(fn ($f) => $qb->expr()->neq($f, $qb->createNamedParameter($v)), $fields),
+            'co' => array_map(fn ($f) => $qb->expr()->like($f, $qb->createNamedParameter('%' . $v . '%')), $fields),
+            'sw' => array_map(fn ($f) => $qb->expr()->like($f, $qb->createNamedParameter($v . '%')), $fields),
+            'ew' => array_map(fn ($f) => $qb->expr()->like($f, $qb->createNamedParameter('%' . $v)), $fields),
+            'pr' => array_map(fn ($f) => $qb->expr()->notLike($f, $qb->createNamedParameter('')), $fields),
+            'gt' => array_map(fn ($f) => $qb->expr()->gt($f, $qb->createNamedParameter($v)), $fields),
+            'ge' => array_map(fn ($f) => $qb->expr()->gte($f, $qb->createNamedParameter($v)), $fields),
+            'lt' => array_map(fn ($f) => $qb->expr()->lt($f, $qb->createNamedParameter($v)), $fields),
+            'le' => array_map(fn ($f) => $qb->expr()->lte($f, $qb->createNamedParameter($v)), $fields),
         };
+        return $qb->expr()->or(...$comparisons);
     }
 
     /**

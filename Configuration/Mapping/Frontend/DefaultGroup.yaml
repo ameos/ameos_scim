@@ -3,7 +3,6 @@ mapping:
     displayName:
       mapOn: title
     members:
-      callback: Ameos\Scim\Evaluator\MemberEvaluator
+      object: Ameos\Scim\CustomObject\MemberObject
       arguments:
         field: usergroup
-      

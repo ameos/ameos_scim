@@ -11,7 +11,7 @@ mapping:
       cast: bool
       toggle: true
     emails:
-      callback: Ameos\Scim\Evaluator\MultiValuedEvaluator
+      object: Ameos\Scim\CustomObject\MultiValuedObject
       arguments:
         - primary:
             value: true

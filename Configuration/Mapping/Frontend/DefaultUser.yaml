@@ -19,7 +19,7 @@ mapping:
       cast: bool
       toggle: true
     emails:
-      callback: Ameos\Scim\Evaluator\MultiValuedEvaluator
+      object: Ameos\Scim\CustomObject\MultiValuedObject
       arguments:
         - primary:
             value: true
@@ -36,4 +36,4 @@ mapping:
     externalId:
       mapOn: scim_external_id
     groups:
-      callback: Ameos\Scim\Evaluator\GroupEvaluator
+      object: Ameos\Scim\CustomObject\GroupObject

@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Ameos\Scim\EventListener;
 
+use Ameos\Scim\CustomObject\MemberObject;
 use Ameos\Scim\Domain\Repository\BackendGroupRepository;
 use Ameos\Scim\Domain\Repository\BackendUserRepository;
 use Ameos\Scim\Domain\Repository\FrontendGroupRepository;
 use Ameos\Scim\Domain\Repository\FrontendUserRepository;
 use Ameos\Scim\Enum\Context;
-use Ameos\Scim\Evaluator\MemberEvaluator;
 use Ameos\Scim\Event\PostDeleteGroupEvent;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -48,7 +48,7 @@ final class CleanUsersAfterGroupRemoved
         while ($user = $results->fetchAssociative()) {
             $data = [];
             foreach ($event->getMapping() as $property => $configuration) {
-                if (isset($configuration['callback']) && $configuration['callback'] === MemberEvaluator::class) {
+                if (isset($configuration['object']) && $configuration['object'] === MemberObject::class) {
                     $field = $configuration['arguments']['field'];
                     $usergroup = array_filter(GeneralUtility::trimExplode(',', $user[$field]));
                     $data[$field] = implode(',', array_filter($usergroup, fn($g) => (int)$g !== (int)$group['uid']));

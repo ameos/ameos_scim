@@ -62,16 +62,12 @@ class PatchService
     {
         $path = trim(str_replace('/', '.', $operation['path']), '/');
 
-        if (!isset($mapping[$path]['callback'])) {
-            $field = $this->mappingService->findField($path, $mapping);
-            $configuration = $this->mappingService->findPropertyConfiguration($path, $mapping);
-            if (isset($configuration['toggle'])) {
-                $operation['value'] = !$operation['value'];
+        if (!isset($mapping[$path]['object'])) {
+            $fields = $this->mappingService->findFieldsCorrespondingProperty($path, $mapping);
+            $value = $this->getOperationValue($operation, $path, $mapping);
+            foreach ($fields as $field) {
+                $record[$field] = $value;
             }
-            if (isset($configuration['cast']) && $configuration['cast'] === 'bool') {
-                $operation['value'] = $operation['value'] ? 1 : 0;            
-            }
-            $record[$field] = $operation['value'];
         }
 
         return $record;
@@ -89,9 +85,11 @@ class PatchService
     {
         $path = trim(str_replace('/', '.', $operation['path']), '/');
 
-        if (!isset($mapping[$path]['callback'])) {
-            $field = $this->mappingService->findField($path, $mapping);
-            $record[$field] = '';
+        if (!isset($mapping[$path]['object'])) {
+            $fields = $this->mappingService->findFieldsCorrespondingProperty($path, $mapping);
+            foreach ($fields as $field) {
+                $record[$field] = '';
+            }
         }
 
         return $record;
@@ -109,16 +107,12 @@ class PatchService
     {
         $path = trim(str_replace('/', '.', $operation['path']), '/');
 
-        if (!isset($mapping[$path]['callback'])) {
-            $field = $this->mappingService->findField($path, $mapping);
-            $configuration = $this->mappingService->findPropertyConfiguration($path, $mapping);
-            if (isset($configuration['toggle'])) {
-                $operation['value'] = !$operation['value'];
+        if (!isset($mapping[$path]['object'])) {
+            $fields = $this->mappingService->findFieldsCorrespondingProperty($path, $mapping);
+            $value = $this->getOperationValue($operation, $path, $mapping);
+            foreach ($fields as $field) {
+                $record[$field] = $value;
             }
-            if (isset($configuration['cast']) && $configuration['cast'] === 'bool') {
-                $operation['value'] = $operation['value'] ? 1 : 0;            
-            }
-            $record[$field] = $operation['value'];
         }
 
         return $record;
@@ -137,9 +131,9 @@ class PatchService
         $from = trim(str_replace('/', '.', $operation['from']), '/');
         $path = trim(str_replace('/', '.', $operation['path']), '/');
 
-        if (!isset($mapping[$path]['callback'])) {
-            $fromField = $this->mappingService->findField($from, $mapping);
-            $pathField = $this->mappingService->findField($path, $mapping);
+        if (!isset($mapping[$path]['object'])) {
+            $fromField = $this->mappingService->findFieldsCorrespondingProperty($from, $mapping)[0];
+            $pathField = $this->mappingService->findFieldsCorrespondingProperty($path, $mapping)[0];
 
             $record[$pathField] = $record[$fromField];
             $record[$fromField] = '';
@@ -161,9 +155,9 @@ class PatchService
         $from = trim(str_replace('/', '.', $operation['from']), '/');
         $path = trim(str_replace('/', '.', $operation['path']), '/');
 
-        if (!isset($mapping[$path]['callback'])) {
-            $fromField = $this->mappingService->findField($from, $mapping);
-            $pathField = $this->mappingService->findField($path, $mapping);
+        if (!isset($mapping[$path]['object'])) {
+            $fromField = $this->mappingService->findFieldsCorrespondingProperty($from, $mapping)[0];
+            $pathField = $this->mappingService->findFieldsCorrespondingProperty($path, $mapping)[0];
 
             $record[$pathField] = $record[$fromField];
         }
@@ -182,20 +176,36 @@ class PatchService
     private function test(array $record, array $operation, array $mapping): array
     {
         $path = trim(str_replace('/', '.', $operation['path']), '/');
-        $field = $this->mappingService->findField($path, $mapping);
+        $fields = $this->mappingService->findFieldsCorrespondingProperty($path, $mapping);
 
-        $configuration = $this->mappingService->findPropertyConfiguration($path, $mapping);
-        if (isset($configuration['toggle'])) {
-            $operation['value'] = !$operation['value'];
-        }
-        if (isset($configuration['cast']) && $configuration['cast'] === 'bool') {
-            $operation['value'] = $operation['value'] ? 1 : 0;            
-        }
-
-        if ($record[$field] !== $operation['value']) {
-            throw new PatchTestErrorException('Test failed');
+        $value = $this->getOperationValue($operation, $path, $mapping);
+        foreach ($fields as $field) {
+            if ($record[$field] !== $value) {
+                throw new PatchTestErrorException('Test failed');
+            }
         }
 
         return $record;
+    }
+
+    /**
+     * return value for an operation
+     *
+     * @param array $operation
+     * @param string $path
+     * @param array $mapping
+     * @return mixed
+     */
+    private function getOperationValue(array $operation, string $path, array $mapping): mixed
+    {
+        $configuration = $this->mappingService->findPropertyConfiguration($path, $mapping);
+        $value = $operation['value'];
+        if (isset($configuration['toggle'])) {
+            $value = !$value;
+        }
+        if (isset($configuration['cast']) && $configuration['cast'] === 'bool') {
+            $value = $value ? 1 : 0;
+        }
+        return $value;
     }
 }

@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Ameos\Scim\EventListener;
 
+use Ameos\Scim\CustomObject\MemberObject;
 use Ameos\Scim\Domain\Repository\AbstractResourceRepository;
 use Ameos\Scim\Domain\Repository\BackendUserRepository;
 use Ameos\Scim\Domain\Repository\FrontendUserRepository;
 use Ameos\Scim\Enum\Context;
 use Ameos\Scim\Enum\PostPersistMode;
-use Ameos\Scim\Evaluator\MemberEvaluator;
 use Ameos\Scim\Event\PostPersistGroupEvent;
 use Ameos\Scim\Service\PatchService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -35,7 +35,7 @@ final class ProcessMembersAfterGroupPersist
     public function __invoke(PostPersistGroupEvent $event): void
     {
         foreach ($event->getMapping() as $property => $configuration) {
-            if (isset($configuration['callback']) && $configuration['callback'] === MemberEvaluator::class) {
+            if (isset($configuration['object']) && $configuration['object'] === MemberObject::class) {
                 $payload = array_change_key_case($event->getPayload());
                 $property = mb_strtolower($property);
                 $usersId = $this->convertPayloadToIds($payload[$property] ?? []);

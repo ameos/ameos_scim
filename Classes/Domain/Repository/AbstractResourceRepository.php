@@ -52,7 +52,7 @@ abstract class AbstractResourceRepository
         $sortOrder = 'ASC';
 
         if (isset($queryParams['sortBy'])) {
-            $sortBy = $this->mappingService->findField($queryParams['sortBy'], $mapping);
+            $sortBy = $this->mappingService->findFieldsCorrespondingProperty($queryParams['sortBy'], $mapping);
         }
         if (isset($queryParams['sortOrder'])) {
             $sortOrder = $queryParams['sortOrder'] === 'ascending' ? 'ASC' : 'DESC';
@@ -77,7 +77,7 @@ abstract class AbstractResourceRepository
      * @param int $pid
      * @param int $startIndex
      * @param int $itemsPerPage
-     * @param string $sortBy
+     * @param array $sortBy
      * @param string $sortOrder
      * @return array
      */
@@ -87,7 +87,7 @@ abstract class AbstractResourceRepository
         int $pid = 0,
         int $startIndex = 1,
         int $itemsPerPage = 10,
-        ?string $sortBy = null,
+        ?array $sortBy = null,
         string $sortOrder = 'ASC'
     ): array {
         $qb = $this->connectionPool->getQueryBuilderForTable($this->getTable());
@@ -116,7 +116,9 @@ abstract class AbstractResourceRepository
             ->setFirstResult($startIndex - 1);
 
         if ($sortBy) {
-            $qb->orderBy($sortBy, $sortOrder);
+            foreach ($sortBy as $sortByItem) {
+                $qb->addOrderBy($sortByItem, $sortOrder);
+            }
         } else {
             $qb->orderBy('uid', $sortOrder);
         }

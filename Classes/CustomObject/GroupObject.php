@@ -2,17 +2,20 @@
 
 declare(strict_types=1);
 
-namespace Ameos\Scim\Evaluator;
+namespace Ameos\Scim\CustomObject;
 
 use Ameos\Scim\Enum\Context;
 use Doctrine\DBAL\ArrayParameterType;
 use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
 use TYPO3\CMS\Core\Database\ConnectionPool;
-use TYPO3\CMS\Core\Http\NormalizedParams;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
-class GroupEvaluator implements EvaluatorInterface
+class GroupObject implements CustomObjectInterface
 {
+    /**
+     * @param ConnectionPool $connectionPool
+     * @param ExtensionConfiguration $extensionConfiguration
+     */
     public function __construct(
         private readonly ConnectionPool $connectionPool,
         private readonly ExtensionConfiguration $extensionConfiguration
@@ -20,13 +23,13 @@ class GroupEvaluator implements EvaluatorInterface
     }
 
     /**
-     * retrieve resource data
+     * return payload for $data
      *
      * @param array $data
      * @param array $configuration
      * @param Context $context
      */
-    public function retrieveResourceData(array $data, array $configuration, Context $context)
+    public function read(array $data, array $configuration, Context $context)
     {
         /** @var NormalizedParams */
         $normalizedParams = $GLOBALS['TYPO3_REQUEST']->getAttribute('normalizedParams');
@@ -64,25 +67,27 @@ class GroupEvaluator implements EvaluatorInterface
     }
 
     /**
-     * set resource data
+     * return update $data array
      *
      * @param array $payload
      * @param array $data
      * @param array $configuration
+     * @return array
      */
-    public function setResourceData(array $payload, array $data, array $configuration)
+    public function write(array $payload, array $data, array $configuration): array
     {
         return $data;
     }
 
     /**
-     * return field
+     * return fields associate to properties
      *
      * @param array $configuration
-     * @return string
+     * @param string $filter
+     * @return array|false
      */
-    public function getFields(array $configuration): ?array
+    public function getAssociateFields(array $configuration, ?string $filter): array|false
     {
-        return null;
+        return false;
     }
 }
