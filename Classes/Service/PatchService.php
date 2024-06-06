@@ -47,7 +47,7 @@ class PatchService
             };
         }
 
-        return array_diff($original, $record);
+        return array_diff_assoc($record, $original);
     }
 
     /**
@@ -64,6 +64,13 @@ class PatchService
 
         if (!isset($mapping[$path]['callback'])) {
             $field = $this->mappingService->findField($path, $mapping);
+            $configuration = $this->mappingService->findPropertyConfiguration($path, $mapping);
+            if (isset($configuration['toggle'])) {
+                $operation['value'] = !$operation['value'];
+            }
+            if (isset($configuration['cast']) && $configuration['cast'] === 'bool') {
+                $operation['value'] = $operation['value'] ? 1 : 0;            
+            }
             $record[$field] = $operation['value'];
         }
 
@@ -104,6 +111,13 @@ class PatchService
 
         if (!isset($mapping[$path]['callback'])) {
             $field = $this->mappingService->findField($path, $mapping);
+            $configuration = $this->mappingService->findPropertyConfiguration($path, $mapping);
+            if (isset($configuration['toggle'])) {
+                $operation['value'] = !$operation['value'];
+            }
+            if (isset($configuration['cast']) && $configuration['cast'] === 'bool') {
+                $operation['value'] = $operation['value'] ? 1 : 0;            
+            }
             $record[$field] = $operation['value'];
         }
 
@@ -169,6 +183,14 @@ class PatchService
     {
         $path = trim(str_replace('/', '.', $operation['path']), '/');
         $field = $this->mappingService->findField($path, $mapping);
+
+        $configuration = $this->mappingService->findPropertyConfiguration($path, $mapping);
+        if (isset($configuration['toggle'])) {
+            $operation['value'] = !$operation['value'];
+        }
+        if (isset($configuration['cast']) && $configuration['cast'] === 'bool') {
+            $operation['value'] = $operation['value'] ? 1 : 0;            
+        }
 
         if ($record[$field] !== $operation['value']) {
             throw new PatchTestErrorException('Test failed');

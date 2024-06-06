@@ -30,9 +30,7 @@ final class MappingTest extends UnitTestCase
                     ],
                 ],
                 'property1',
-                [
-                    'field1'
-                ]
+                'field1'
             ],
             'two level property' => [
                 [
@@ -43,9 +41,7 @@ final class MappingTest extends UnitTestCase
                     ],
                 ],
                 'property2.subproperty',
-                [
-                    'field2'
-                ]
+                'field2'
             ],
         ];
     }
@@ -55,11 +51,11 @@ final class MappingTest extends UnitTestCase
      *
      * @param array $mapping
      * @param string $property
-     * @param array $expectedResult
+     * @param string $expectedResult
      */
     #[DataProvider('findFieldProvider')]
     #[Test]
-    public function findField(array $mapping, string $property, array $expectedResult): void
+    public function findField(array $mapping, string $property, string $expectedResult): void
     {
         $mappingService = new MappingService();
 

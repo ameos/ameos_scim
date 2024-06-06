@@ -91,6 +91,7 @@ abstract class AbstractResourceRepository
         string $sortOrder = 'ASC'
     ): array {
         $qb = $this->connectionPool->getQueryBuilderForTable($this->getTable());
+        $qb->getRestrictions()->removeByType(HiddenRestriction::class);
 
         $constraints = [];
         $constraints[] = $qb->expr()->eq('pid', $qb->createNamedParameter($pid, Connection::PARAM_INT));
@@ -134,6 +135,7 @@ abstract class AbstractResourceRepository
     public function findById(array $resourceIds): Result
     {
         $qb = $this->connectionPool->getQueryBuilderForTable($this->getTable());
+        $qb->getRestrictions()->removeByType(HiddenRestriction::class);
         return $qb
             ->select('*')
             ->from($this->getTable())
@@ -156,10 +158,9 @@ abstract class AbstractResourceRepository
     public function find(string $resourceId, bool $withDeleted = false): array|false
     {
         $qb = $this->connectionPool->getQueryBuilderForTable($this->getTable());
+        $qb->getRestrictions()->removeByType(HiddenRestriction::class);
         if ($withDeleted) {
-            $qb->getRestrictions()
-                ->removeByType(HiddenRestriction::class)
-                ->removeByType(DeletedRestriction::class);
+            $qb->getRestrictions()->removeByType(DeletedRestriction::class);
         }
         return $qb
             ->select('*')
@@ -212,6 +213,7 @@ abstract class AbstractResourceRepository
     public function delete(string $resourceId): void
     {
         $qb = $this->connectionPool->getQueryBuilderForTable($this->getTable());
+        $qb->getRestrictions()->removeByType(HiddenRestriction::class);
         $qb
             ->update($this->getTable())
             ->set('deleted', 1, true, Connection::PARAM_INT)

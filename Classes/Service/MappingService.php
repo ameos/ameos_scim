@@ -125,24 +125,51 @@ class MappingService
      * @param array $mapping
      * @return array|false
      */
-    public function findField(string $property, array $mapping): array|false
+    public function findPropertyConfiguration(string $property, array $mapping): array|false
     {
         $currentMapping = $mapping;
         foreach (explode('.', $property) as $propertyItem) {
             foreach ($currentMapping as $key => $value) {
                 if (mb_strtolower($key) === mb_strtolower($propertyItem)) {
                     if (isset($value['mapOn'])) {
-                        return [$value['mapOn']];
+                        return $value;
                     }
 
+                    $currentMapping = $value;
+                    break;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * return field map on a property the mapping
+     *
+     * @param string $property
+     * @param array $mapping
+     * @return string|false
+     */
+    public function findField(string $property, array $mapping, ): string|false
+    {
+        $currentMapping = $mapping;
+        foreach (explode('.', $property) as $propertyItem) {
+            foreach ($currentMapping as $key => $value) {
+                if (mb_strtolower($key) === mb_strtolower($propertyItem)) {
+                    if (isset($value['mapOn'])) {
+                        return $value['mapOn'];
+                    }
+
+                    /*                    
                     if (isset($value['callback'])) {
-                        /** @var EvaluatorInterface */
                         $evaluator = GeneralUtility::makeInstance($value['callback']);
                         $fields = $evaluator->getFields($value);
                         if ($fields) {
                             return $fields;
                         }
                     }
+                    */
 
                     $currentMapping = $value;
                     break;
