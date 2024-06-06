@@ -6,9 +6,13 @@ namespace Ameos\Scim\Domain\Repository;
 
 use Ameos\Scim\Service\FilterService;
 use Ameos\Scim\Service\MappingService;
+use Doctrine\DBAL\ArrayParameterType;
+use Doctrine\DBAL\Result;
 use Symfony\Component\Uid\UuidV6;
 use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
+use TYPO3\CMS\Core\Database\Query\Restriction\DeletedRestriction;
+use TYPO3\CMS\Core\Database\Query\Restriction\HiddenRestriction;
 
 abstract class AbstractResourceRepository
 {
@@ -43,6 +47,7 @@ abstract class AbstractResourceRepository
     {
         $startIndex = isset($queryParams['startIndex']) ? (int)$queryParams['startIndex'] : 1;
         $itemsPerPage = isset($queryParams['itemsPerPage']) ? (int)$queryParams['itemsPerPage'] : 10;
+        $filters = $queryParams['filter'] ?? null;
         $sortBy = null;
         $sortOrder = 'ASC';
 
@@ -53,15 +58,47 @@ abstract class AbstractResourceRepository
             $sortOrder = $queryParams['sortOrder'] === 'ascending' ? 'ASC' : 'DESC';
         }
 
+        return $this->findByFilters(
+            $filters,
+            $mapping,
+            $pid,
+            $startIndex,
+            $itemsPerPage,
+            $sortBy,
+            $sortOrder
+        );
+    }
+
+    /**
+     * find by filters
+     *
+     * @param string $filters
+     * @param array $mapping
+     * @param int $pid
+     * @param int $startIndex
+     * @param int $itemsPerPage
+     * @param string $sortBy
+     * @param string $sortOrder
+     * @return array
+     */
+    public function findByFilters(
+        ?string $filters,
+        array $mapping,
+        int $pid = 0,
+        int $startIndex = 1,
+        int $itemsPerPage = 10,
+        ?string $sortBy = null,
+        string $sortOrder = 'ASC'
+    ): array {
         $qb = $this->connectionPool->getQueryBuilderForTable($this->getTable());
 
         $constraints = [];
         $constraints[] = $qb->expr()->eq('pid', $qb->createNamedParameter($pid, Connection::PARAM_INT));
 
-        if (isset($queryParams['filter'])) {
-            $filters = $this->filterService->convertFilter($queryParams['filter'], $qb, $mapping);
-            if ($filters) {
-                $constraints[] = $qb->expr()->and(...$filters);
+        if ($filters) {
+            $filtersContraints = $this->filterService->convertFilter($filters, $qb, $mapping);
+            if ($filtersContraints) {
+                $constraints[] = $qb->expr()->and(...$filtersContraints);
             }
         }
 
@@ -89,16 +126,41 @@ abstract class AbstractResourceRepository
     }
 
     /**
-     * detail a resource
+     * find by scim ids
      *
      * @param string $resourceId
-     * @param array $queryParams
-     * @param array $configuration
-     * @return array|false
+     * @return Result
      */
-    public function read(string $resourceId): array|false
+    public function findById(array $resourceIds): Result
     {
         $qb = $this->connectionPool->getQueryBuilderForTable($this->getTable());
+        return $qb
+            ->select('*')
+            ->from($this->getTable())
+            ->where(
+                $qb->expr()->in(
+                    'scim_id',
+                    $qb->createNamedParameter($resourceIds, ArrayParameterType::STRING)
+                )
+            )
+            ->executeQuery();
+    }
+
+    /**
+     * find a resource
+     *
+     * @param string $resourceId
+     * @param bool $withDeleted
+     * @return array|false
+     */
+    public function find(string $resourceId, bool $withDeleted = false): array|false
+    {
+        $qb = $this->connectionPool->getQueryBuilderForTable($this->getTable());
+        if ($withDeleted) {
+            $qb->getRestrictions()
+                ->removeByType(HiddenRestriction::class)
+                ->removeByType(DeletedRestriction::class);
+        }
         return $qb
             ->select('*')
             ->from($this->getTable())
@@ -138,7 +200,7 @@ abstract class AbstractResourceRepository
         $data['tstamp'] = time();
         $connection = $this->connectionPool->getConnectionForTable($this->getTable());
         $connection->update($this->getTable(), $data, ['scim_id' => $resourceId]);
-        return $this->read($resourceId);
+        return $this->find($resourceId);
     }
 
     /**

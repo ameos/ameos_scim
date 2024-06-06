@@ -92,7 +92,7 @@ class UserService
         $attributes = isset($queryParams['attributes']) ? explode(',', $queryParams['attributes']) : [];
         $excludedAttributes = isset($queryParams['excludedAttributes'])
             ? explode(',', $queryParams['excludedAttributes']) : [];
-        $user = $this->backendUserRepository->read($userId);
+        $user = $this->backendUserRepository->find($userId);
 
         if (!$user) {
             throw new NoResourceFoundException('User not found');
@@ -158,7 +158,7 @@ class UserService
      */
     public function patch(string $userId, array $payload, array $configuration): array
     {
-        $record = $this->backendUserRepository->read($userId);
+        $record = $this->backendUserRepository->find($userId);
         $data = $this->patchService->apply($record, $payload, $configuration['mapping']);
         if (!empty($data)) {
             $data = $this->backendUserRepository->update($userId, $data);

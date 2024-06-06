@@ -24,10 +24,11 @@ class BackendUserRepository extends AbstractResourceRepository
      * return user by group
      *
      * @param int $groupId
+     * @param bool $withDeleted
      * @return Result
      */
-    public function findByUserGroup(int $groupId): Result
+    public function findByUserGroup(int $groupId, bool $withDeleted = false): Result
     {
-        return $this->findByUserGroupWithTables($groupId, 'be_users');
+        return $this->findByUserGroupWithTables($groupId, 'be_users', $withDeleted);
     }
 }

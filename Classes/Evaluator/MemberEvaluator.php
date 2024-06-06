@@ -56,4 +56,15 @@ class MemberEvaluator implements EvaluatorInterface
         // need group id, logic in post persist event with attach member listener
         return $data;
     }
+
+    /**
+     * return field
+     *
+     * @param array $configuration
+     * @return string
+     */
+    public function getFields(array $configuration): ?array
+    {
+        return null;
+    }
 }

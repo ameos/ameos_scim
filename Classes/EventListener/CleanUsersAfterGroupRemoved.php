@@ -13,7 +13,7 @@ use Ameos\Scim\Evaluator\MemberEvaluator;
 use Ameos\Scim\Event\PostDeleteGroupEvent;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
-final class CleanUserAfterGroupRemoved
+final class CleanUsersAfterGroupRemoved
 {
     /**
      * @param FrontendUserRepository $frontendUserRepository
@@ -43,7 +43,7 @@ final class CleanUserAfterGroupRemoved
         $groupRepository = $event->getContext() === Context::Frontend
             ? $this->frontendGroupRepository : $this->backendGroupRepository;
 
-        $group = $groupRepository->read($event->getRecordId());
+        $group = $groupRepository->find($event->getRecordId(), true);
         $results = $userRepository->findByUserGroup((int)$group['uid']);
         while ($user = $results->fetchAssociative()) {
             $data = [];
@@ -51,7 +51,7 @@ final class CleanUserAfterGroupRemoved
                 if (isset($configuration['callback']) && $configuration['callback'] === MemberEvaluator::class) {
                     $field = $configuration['arguments']['field'];
                     $usergroup = array_filter(GeneralUtility::trimExplode(',', $user[$field]));
-                    $data[$field] = array_filter($usergroup, fn($g) => (int)$g !== (int)$group['uid']);
+                    $data[$field] = implode(',', array_filter($usergroup, fn($g) => (int)$g !== (int)$group['uid']));
                 }
             }
 

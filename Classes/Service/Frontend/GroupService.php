@@ -92,7 +92,7 @@ class GroupService
         $attributes = isset($queryParams['attributes']) ? explode(',', $queryParams['attributes']) : [];
         $excludedAttributes = isset($queryParams['excludedAttributes'])
             ? explode(',', $queryParams['excludedAttributes']) : [];
-        $group = $this->frontendGroupRepository->read($groupId);
+        $group = $this->frontendGroupRepository->find($groupId);
 
         if (!$group) {
             throw new NoResourceFoundException('Group not found');
@@ -158,7 +158,7 @@ class GroupService
      */
     public function patch(string $groupId, array $payload, array $configuration): array
     {
-        $record = $this->frontendGroupRepository->read($groupId);
+        $record = $this->frontendGroupRepository->find($groupId);
         $data = $this->patchService->apply($record, $payload, $configuration['mapping']);
         if (!empty($data)) {
             $record = $this->frontendGroupRepository->update($groupId, $data);

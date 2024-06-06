@@ -6,6 +6,8 @@ namespace Ameos\Scim\Domain\Repository\Traits;
 
 use Doctrine\DBAL\Result;
 use TYPO3\CMS\Core\Database\Connection;
+use TYPO3\CMS\Core\Database\Query\Restriction\DeletedRestriction;
+use TYPO3\CMS\Core\Database\Query\Restriction\HiddenRestriction;
 
 trait UserRepository
 {
@@ -14,11 +16,18 @@ trait UserRepository
      *
      * @param int $groupId
      * @param string $userTable
+     * @param bool $withDeleted
      * @return Result
      */
-    public function findByUserGroupWithTables(int $groupId, string $userTable): Result
+    public function findByUserGroupWithTables(int $groupId, string $userTable, bool $withDeleted = false): Result
     {
         $qb = $this->connectionPool->getQueryBuilderForTable($userTable);
+        if ($withDeleted) {
+            $qb->getRestrictions()
+                ->removeByType(HiddenRestriction::class)
+                ->removeByType(DeletedRestriction::class);
+        }
+
         return $qb
             ->select('*')
             ->from($userTable)

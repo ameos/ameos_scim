@@ -36,6 +36,7 @@ class PatchService
 
         $payload = array_change_key_case($payload);
         foreach ($payload['operations'] as $operation) {
+            $operation = array_change_key_case($operation);
             $record = match ($operation['op']) {
                 self::OP_ADD => $this->add($record, $operation, $mapping),
                 self::OP_REMOVE => $this->remove($record, $operation, $mapping),
@@ -60,9 +61,9 @@ class PatchService
     private function add(array $record, array $operation, array $mapping): array
     {
         $path = trim(str_replace('/', '.', $operation['path']), '/');
-        $field = $this->mappingService->findField($path, $mapping);
 
-        if (!isset($mapping[$operation['path']]['callback'])) {
+        if (!isset($mapping[$path]['callback'])) {
+            $field = $this->mappingService->findField($path, $mapping);
             $record[$field] = $operation['value'];
         }
 
@@ -80,9 +81,11 @@ class PatchService
     private function remove(array $record, array $operation, array $mapping): array
     {
         $path = trim(str_replace('/', '.', $operation['path']), '/');
-        $field = $this->mappingService->findField($path, $mapping);
 
-        $record[$field] = $operation['value'];
+        if (!isset($mapping[$path]['callback'])) {
+            $field = $this->mappingService->findField($path, $mapping);
+            $record[$field] = '';
+        }
 
         return $record;
     }
@@ -98,9 +101,11 @@ class PatchService
     private function replace(array $record, array $operation, array $mapping): array
     {
         $path = trim(str_replace('/', '.', $operation['path']), '/');
-        $field = $this->mappingService->findField($path, $mapping);
 
-        $record[$field] = $operation['value'];
+        if (!isset($mapping[$path]['callback'])) {
+            $field = $this->mappingService->findField($path, $mapping);
+            $record[$field] = $operation['value'];
+        }
 
         return $record;
     }
@@ -117,11 +122,14 @@ class PatchService
     {
         $from = trim(str_replace('/', '.', $operation['from']), '/');
         $path = trim(str_replace('/', '.', $operation['path']), '/');
-        $fromField = $this->mappingService->findField($from, $mapping);
-        $pathField = $this->mappingService->findField($path, $mapping);
 
-        $record[$pathField] = $record[$fromField];
-        $record[$fromField] = '';
+        if (!isset($mapping[$path]['callback'])) {
+            $fromField = $this->mappingService->findField($from, $mapping);
+            $pathField = $this->mappingService->findField($path, $mapping);
+
+            $record[$pathField] = $record[$fromField];
+            $record[$fromField] = '';
+        }
 
         return $record;
     }
@@ -138,10 +146,13 @@ class PatchService
     {
         $from = trim(str_replace('/', '.', $operation['from']), '/');
         $path = trim(str_replace('/', '.', $operation['path']), '/');
-        $fromField = $this->mappingService->findField($from, $mapping);
-        $pathField = $this->mappingService->findField($path, $mapping);
 
-        $record[$pathField] = $record[$fromField];
+        if (!isset($mapping[$path]['callback'])) {
+            $fromField = $this->mappingService->findField($from, $mapping);
+            $pathField = $this->mappingService->findField($path, $mapping);
+
+            $record[$pathField] = $record[$fromField];
+        }
 
         return $record;
     }

@@ -74,4 +74,15 @@ class MultiValuedEvaluator implements EvaluatorInterface
 
         return $data;
     }
+
+    /**
+     * return field
+     *
+     * @param array $configuration
+     * @return string
+     */
+    public function getFields(array $configuration): ?array
+    {
+        return null; // todo
+    }
 }

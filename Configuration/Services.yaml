@@ -28,12 +28,12 @@ services:
   Ameos\Scim\Evaluator\MemberEvaluator:
     public: true
 
-  Ameos\Scim\EventListener\AttachMemberAfterGroupPersist:
+  Ameos\Scim\EventListener\ProcessMembersAfterGroupPersist:
     tags:
       - name: event.listener
-        identifier: 'scim/attach-member'
+        identifier: 'scim/process-members'
 
-  Ameos\Scim\EventListener\CleanUserAfterGroupRemoved:
+  Ameos\Scim\EventListener\CleanUsersAfterGroupRemoved:
     tags:
       - name: event.listener
-        identifier: 'scim/clean-user'
+        identifier: 'scim/clean-users'

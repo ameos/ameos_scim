@@ -25,4 +25,12 @@ interface EvaluatorInterface
      * @param array $configuration
      */
     public function setResourceData(array $payload, array $data, array $configuration);
+
+    /**
+     * return field
+     *
+     * @param array $configuration
+     * @return string
+     */
+    public function getFields(array $configuration): ?array;
 }
