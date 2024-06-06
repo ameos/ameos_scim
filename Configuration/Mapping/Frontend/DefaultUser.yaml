@@ -25,6 +25,17 @@ mapping:
             value: true
           value: 
             mapOn: email
+    phoneNumbers:
+      object: Ameos\Scim\CustomObject\MultiValuedObject
+      arguments:
+        - type:
+            value: telephone
+          value: 
+            mapOn: telephone
+        - type:
+            value: fax
+          value: 
+            mapOn: fax
     addresses.streetAddress:
       mapOn: address
     addresses.locality:
