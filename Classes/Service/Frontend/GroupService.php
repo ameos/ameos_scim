@@ -218,7 +218,7 @@ class GroupService
             Context::Frontend
         );
 
-        $apiPath = $this->extensionConfiguration->get('scim', 'fe_path') . '/Groups/';
+        $apiPath = $this->extensionConfiguration->get('scim', 'fe_path') . 'Groups/';
 
         $data['schemas'] = ['urn:ietf:params:scim:schemas:core:2.0:Group'];
         $data['id'] = $group['scim_id'];
@@ -226,7 +226,7 @@ class GroupService
             'resourceType' => 'group',
             'created' => \DateTime::createFromFormat('U', (string)$group['crdate'])->format('c'),
             'lastModified' => \DateTime::createFromFormat('U', (string)$group['tstamp'])->format('c'),
-            'location' => $normalizedParams->getSiteUrl() . $apiPath . $group['scim_id'],
+            'location' => trim($normalizedParams->getSiteUrl(), '/') . $apiPath . $group['scim_id'],
             'version' => 'W/"' . md5((string)$group['tstamp']) . '"',
         ];
 

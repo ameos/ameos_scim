@@ -6,13 +6,17 @@ namespace Ameos\Scim\Evaluator;
 
 use Ameos\Scim\Enum\Context;
 use Doctrine\DBAL\ArrayParameterType;
+use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
 use TYPO3\CMS\Core\Database\ConnectionPool;
+use TYPO3\CMS\Core\Http\NormalizedParams;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class GroupEvaluator implements EvaluatorInterface
 {
-    public function __construct(private readonly ConnectionPool $connectionPool)
-    {
+    public function __construct(
+        private readonly ConnectionPool $connectionPool,
+        private readonly ExtensionConfiguration $extensionConfiguration
+    ) {
     }
 
     /**
@@ -24,7 +28,11 @@ class GroupEvaluator implements EvaluatorInterface
      */
     public function retrieveResourceData(array $data, array $configuration, Context $context)
     {
-        // add $ref
+        /** @var NormalizedParams */
+        $normalizedParams = $GLOBALS['TYPO3_REQUEST']->getAttribute('normalizedParams');
+        $confPath = $context === Context::Frontend ? 'fe_path' : 'be_path';
+        $apiPath = $this->extensionConfiguration->get('scim', $confPath) . 'Groups/';
+
         $usergroups = [];
         if (isset($data['usergroup'])) {
             // todo / be / fe
@@ -46,7 +54,11 @@ class GroupEvaluator implements EvaluatorInterface
         }
 
         return array_map(
-            fn ($group) => ['value' => $group['scim_id'], 'display' => $group['title']],
+            fn ($group) => [
+                'value' => $group['scim_id'],
+                'display' => $group['title'],
+                '$ref' => rtrim($normalizedParams->getSiteUrl(), '/') . $apiPath . $group['scim_id'],
+            ],
             $usergroups
         );
     }

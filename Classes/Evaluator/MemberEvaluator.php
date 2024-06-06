@@ -5,13 +5,17 @@ declare(strict_types=1);
 namespace Ameos\Scim\Evaluator;
 
 use Ameos\Scim\Enum\Context;
+use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
 use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
+use TYPO3\CMS\Core\Http\NormalizedParams;
 
 class MemberEvaluator implements EvaluatorInterface
 {
-    public function __construct(private readonly ConnectionPool $connectionPool)
-    {
+    public function __construct(
+        private readonly ConnectionPool $connectionPool,
+        private readonly ExtensionConfiguration $extensionConfiguration
+    ) {
     }
 
     /**
@@ -23,7 +27,11 @@ class MemberEvaluator implements EvaluatorInterface
      */
     public function retrieveResourceData(array $data, array $configuration, Context $context)
     {
-        // TODO add $ref
+        /** @var NormalizedParams */
+        $normalizedParams = $GLOBALS['TYPO3_REQUEST']->getAttribute('normalizedParams');
+        $confPath = $context === Context::Frontend ? 'fe_path' : 'be_path';
+        $apiPath = $this->extensionConfiguration->get('scim', $confPath) . 'Users/';
+
         $table = $context === Context::Frontend ? 'fe_users' : 'be_users';
         $qb = $this->connectionPool->getQueryBuilderForTable($table);
         $users = $qb
@@ -39,7 +47,12 @@ class MemberEvaluator implements EvaluatorInterface
             ->fetchAllAssociative();
 
         return array_map(
-            fn ($user) => ['value' => $user['scim_id'], 'display' => $user['username'], 'type' => 'User'],
+            fn ($user) => [
+                'value' => $user['scim_id'],
+                'display' => $user['username'],
+                '$ref' => trim($normalizedParams->getSiteUrl(), '/') . $apiPath . $user['scim_id'],
+                'type' => 'User'
+            ],
             $users
         );
     }

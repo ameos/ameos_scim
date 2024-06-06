@@ -62,7 +62,7 @@ final class MappingTest extends UnitTestCase
     public function findField(array $mapping, string $property, array $expectedResult): void
     {
         $mappingService = new MappingService();
-        
+
         self::assertEquals($expectedResult, $mappingService->findField($property, $mapping));
     }
 }

@@ -218,7 +218,7 @@ class UserService
             Context::Backend
         );
 
-        $apiPath = $this->extensionConfiguration->get('scim', 'be_path') . '/Users/';
+        $apiPath = $this->extensionConfiguration->get('scim', 'be_path') . 'Users/';
 
         $data['schemas'] = ['urn:ietf:params:scim:schemas:core:2.0:User'];
         $data['id'] = $user['scim_id'];
@@ -226,7 +226,7 @@ class UserService
             'resourceType' => 'User',
             'created' => \DateTime::createFromFormat('U', (string)$user['crdate'])->format('c'),
             'lastModified' => \DateTime::createFromFormat('U', (string)$user['tstamp'])->format('c'),
-            'location' => $normalizedParams->getSiteUrl() . $apiPath . $user['scim_id'],
+            'location' => trim($normalizedParams->getSiteUrl(), '/') . $apiPath . $user['scim_id'],
             'version' => 'W/"' . md5((string)$user['tstamp']) . '"',
         ];
 
