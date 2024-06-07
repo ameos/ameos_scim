@@ -1,5 +1,10 @@
 scim:
   frontend.user:
+    meta:
+      created:
+        mapOn: crdate
+      lastModified:
+        mapOn: tstamp
     mapping:
       userName:
         mapOn: username

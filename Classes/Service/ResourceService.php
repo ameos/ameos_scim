@@ -73,7 +73,7 @@ class ResourceService
                 $resourceType,
                 $context,
                 $resource,
-                $configuration['mapping'],
+                $configuration,
                 $attributes,
                 $excludedAttributes
             );
@@ -114,7 +114,7 @@ class ResourceService
             $resourceType,
             $context,
             $resource,
-            $configuration['mapping'],
+            $configuration,
             $attributes,
             $excludedAttributes
         );
@@ -203,7 +203,7 @@ class ResourceService
      *
      * @param ResourceType $resourceType
      * @param array $resource
-     * @param array $mapping
+     * @param array $configuration
      * @param array $attributes
      * @param array $excludedAttributes
      * @return array
@@ -212,7 +212,7 @@ class ResourceService
         ResourceType $resourceType,
         Context $context,
         array $resource,
-        array $mapping,
+        array $configuration,
         array $attributes = [],
         array $excludedAttributes = []
     ): array {
@@ -221,7 +221,7 @@ class ResourceService
 
         $data = $this->mappingService->dataToPayload(
             $resource,
-            $mapping,
+            $configuration['mapping'],
             $attributes,
             $excludedAttributes,
             $context
@@ -229,12 +229,15 @@ class ResourceService
 
         $apiPath = $this->extensionConfiguration->get('scim', 'be_path') . $resourceType->value . '/';
 
+        $createdField = $configuration['meta']['created']['mapOn'] ?? 'crdate';
+        $lastModifiedField = $configuration['meta']['lastModified']['mapOn'] ?? 'tstamp';
+
         $data['schemas'] = ['urn:ietf:params:scim:schemas:core:2.0:' . $resourceType->value];
         $data['id'] = $resource['scim_id'];
         $data['meta'] = [
             'resourceType' => $resourceType->value,
-            'created' => \DateTime::createFromFormat('U', (string)$resource['crdate'])->format('c'),
-            'lastModified' => \DateTime::createFromFormat('U', (string)$resource['tstamp'])->format('c'),
+            'created' => \DateTime::createFromFormat('U', (string)$resource[$createdField])->format('c'),
+            'lastModified' => \DateTime::createFromFormat('U', (string)$resource[$lastModifiedField])->format('c'),
             'location' => trim($normalizedParams->getSiteUrl(), '/') . $apiPath . $resource['scim_id'],
             'version' => 'W/"' . md5((string)$resource['tstamp']) . '"',
         ];

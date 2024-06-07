@@ -1,5 +1,10 @@
 scim:
   backend.group:
+    meta:
+      created:
+        mapOn: crdate
+      lastModified:
+        mapOn: tstamp
     mapping:
       displayName:
         mapOn: title
