@@ -90,7 +90,7 @@ abstract class AbstractResourceController
             };
 
             $yamlConfiguration = (new YamlFileLoader())->load($GLOBALS['TYPO3_CONF_VARS']['SCIM']['Configuration']);
-            $configuration['mapping'] = $yamlConfiguration['mapping'][$mappingKey];
+            $configuration['mapping'] = $yamlConfiguration['scim'][$mappingKey]['mapping'];
         }
 
         if ($request->getAttribute('scim_context') === Context::Frontend) {

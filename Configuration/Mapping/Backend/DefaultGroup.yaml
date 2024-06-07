@@ -1,9 +1,10 @@
-mapping:
+scim:
   backend.group:
-    displayName:
-      mapOn: title
-    members:
-      object: Ameos\Scim\CustomObject\MemberObject
-      arguments:
-        field_user: usergroup
-        field_group: subgroup
+    mapping:
+      displayName:
+        mapOn: title
+      members:
+        object: Ameos\Scim\CustomObject\MemberObject
+        arguments:
+          field_user: usergroup
+          field_group: subgroup
