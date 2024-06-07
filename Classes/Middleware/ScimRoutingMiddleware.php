@@ -10,7 +10,8 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Log\LoggerInterface;
-use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
+use TYPO3\CMS\Core\Crypto\PasswordHashing\PasswordHashFactory;
+use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Error\Http\ForbiddenException;
 use TYPO3\CMS\Core\Log\Channel;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -19,12 +20,12 @@ class ScimRoutingMiddleware implements MiddlewareInterface
 {
     /**
      * @param RoutingService $routingService
-     * @param ExtensionConfiguration $extensionConfiguration
+     * @param ConnectionPool $connectionPool
      * @param LoggerInterface $logger
      */
     public function __construct(
         private readonly RoutingService $routingService,
-        private readonly ExtensionConfiguration $extensionConfiguration,
+        private readonly ConnectionPool $connectionPool,
         #[Channel('scim')]
         private readonly LoggerInterface $logger
     ) {
@@ -43,8 +44,7 @@ class ScimRoutingMiddleware implements MiddlewareInterface
         if ($request->getAttribute('is_scim_request')) {
             $authorization = $request->getHeader('authorization');
             if (isset($authorization[0]) && preg_match('/Bearer\s(\S+)/', $authorization[0], $matches)) {
-                $bearer = $this->extensionConfiguration->get('scim', 'bearer');
-                if ($bearer !== $matches[1]) {
+                if (!$this->isAuthorizedSecret($matches[1])) {
                     $this->logger->critical('Access denied - Bearer not match');
                     throw new ForbiddenException('Access denied');
                 }
@@ -57,5 +57,25 @@ class ScimRoutingMiddleware implements MiddlewareInterface
         }
 
         return $handler->handle($request);
+    }
+
+    /**
+     * return true if secret is authorized
+     *
+     * @param string $secret
+     * @return bool
+     */
+    private function isAuthorizedSecret(string $secret): bool
+    {
+        $hashInstance = GeneralUtility::makeInstance(PasswordHashFactory::class)->getDefaultHashInstance('BE');
+
+        $qb = $this->connectionPool->getQueryBuilderForTable('tx_scim_access');
+        $result = $qb->select('*')->from('tx_scim_access')->executeQuery();
+        while ($access = $result->fetchAssociative()) {
+            if ($hashInstance->checkPassword($secret, $access['secret'])) {
+                return true;
+            }
+        }
+        return false;
     }
 }

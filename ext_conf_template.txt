@@ -1,6 +1,3 @@
-# cat=basic/enable; type=string; label=Bearer token value
-bearer = 
-
 # cat=basic/enable; type=boolean; label=Activate SCIM for backend
 be_activation = 1
 
