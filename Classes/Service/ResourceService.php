@@ -226,7 +226,8 @@ class ResourceService
             $context
         );
 
-        $apiPath = $this->extensionConfiguration->get('scim', 'be_path') . $resourceType->value . '/';
+        $pathConf = $context === Context::Frontend ? 'fe_path' : 'be_path';
+        $apiPath = $this->extensionConfiguration->get('scim', $pathConf) . $resourceType->value . '/';
 
         $createdField = $configuration['meta']['created']['mapOn'] ?? 'crdate';
         $lastModifiedField = $configuration['meta']['lastModified']['mapOn'] ?? 'tstamp';
