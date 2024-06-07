@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Ameos\Scim\Service;
 
 use Ameos\Scim\Controller\AbstractResourceController;
+use Ameos\Scim\Controller\BulkController;
 use Ameos\Scim\Controller\GroupController;
 use Ameos\Scim\Controller\UserController;
 use Ameos\Scim\Controller\ResourceTypeController;
@@ -18,11 +19,11 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class RoutingService
 {
-    protected const HTTP_GET = 'GET';
-    protected const HTTP_PUT = 'PUT';
-    protected const HTTP_POST = 'POST';
-    protected const HTTP_PATCH = 'PATCH';
-    protected const HTTP_DELETE = 'DELETE';
+    public const HTTP_GET = 'GET';
+    public const HTTP_PUT = 'PUT';
+    public const HTTP_POST = 'POST';
+    public const HTTP_PATCH = 'PATCH';
+    public const HTTP_DELETE = 'DELETE';
 
     /**
      * @param ExtensionConfiguration $extensionConfiguration
@@ -56,48 +57,42 @@ class RoutingService
             preg_match($regexRoot, $request->getUri()->getPath(), $matches)
             && $request->getMethod() === self::HTTP_GET
         ) {
-            $response = $this->getControllerForSegment($matches[1], $context)
-                ->searchAction($request, $context);
+            $response = $this->getController($matches[1], $context)->searchAction($request, $context);
         }
 
         if (
             preg_match($regexRoot, $request->getUri()->getPath(), $matches)
             && $request->getMethod() === self::HTTP_POST
         ) {
-            $response = $this->getControllerForSegment($matches[1], $context)
-                ->createAction($request, $context);
+            $response = $this->getController($matches[1], $context)->createAction($request, $context);
         }
 
         if (
             preg_match($regexUuid, $request->getUri()->getPath(), $matches)
             && $request->getMethod() === self::HTTP_GET
         ) {
-            $response = $this->getControllerForSegment($matches[1], $context)
-                ->readAction($matches[2], $request, $context);
+            $response = $this->getController($matches[1], $context)->readAction($matches[2], $request, $context);
         }
 
         if (
             preg_match($regexUuid, $request->getUri()->getPath(), $matches)
             && $request->getMethod() === self::HTTP_PATCH
         ) {
-            $response = $this->getControllerForSegment($matches[1], $context)
-                ->patchAction($matches[2], $request, $context);
+            $response = $this->getController($matches[1], $context)->patchAction($matches[2], $request, $context);
         }
 
         if (
             preg_match($regexUuid, $request->getUri()->getPath(), $matches)
             && $request->getMethod() === self::HTTP_PUT
         ) {
-            $response = $this->getControllerForSegment($matches[1], $context)
-                ->updateAction($matches[2], $request, $context);
+            $response = $this->getController($matches[1], $context)->updateAction($matches[2], $request, $context);
         }
 
         if (
             preg_match($regexUuid, $request->getUri()->getPath(), $matches)
             && $request->getMethod() === self::HTTP_DELETE
         ) {
-            $response = $this->getControllerForSegment($matches[1], $context)
-                ->deleteAction($matches[2], $request, $context);
+            $response = $this->getController($matches[1], $context)->deleteAction($matches[2], $request, $context);
         }
 
         if (
@@ -105,6 +100,13 @@ class RoutingService
             && $request->getMethod() === self::HTTP_GET
         ) {
             $response = GeneralUtility::makeInstance(ResourceTypeController::class)->indexAction($request);
+        }
+
+        if (
+            preg_match('/^' . $path . 'Bulk$/i', $request->getUri()->getPath())
+            && $request->getMethod() === self::HTTP_POST
+        ) {
+            $response = GeneralUtility::makeInstance(BulkController::class)->bulkAction($request, $context);
         }
 
         if (
@@ -130,7 +132,7 @@ class RoutingService
      * @param Context $context
      * @return AbstractResourceController
      */
-    private function getControllerForSegment(string $segment, Context $context): ?AbstractResourceController
+    private function getController(string $segment, Context $context): ?AbstractResourceController
     {
         $controller = null;
         if (mb_strtolower($segment) === 'users') {
