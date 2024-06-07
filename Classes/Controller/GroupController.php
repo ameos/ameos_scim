@@ -120,9 +120,9 @@ class GroupController extends AbstractResourceController
     public function createAction(ServerRequestInterface $request, Context $context): ResponseInterface
     {
         $payload = json_decode($request->getBody()->getContents(), true);
-        $this->logger->info('Create group', $payload);
+        $this->logger->info('Create group', []);
         if (!$payload) {
-            $this->logger->error('Error during group creation', $payload);
+            $this->logger->error('Error during group creation', []);
             return new JsonResponse(
                 [
                     'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],

@@ -120,9 +120,9 @@ class UserController extends AbstractResourceController
     public function createAction(ServerRequestInterface $request, Context $context): ResponseInterface
     {
         $payload = json_decode($request->getBody()->getContents(), true);
-        $this->logger->info('Create user', $payload);
+        $this->logger->info('Create user', []);
         if (!$payload) {
-            $this->logger->error('Error during user creation', $payload);
+            $this->logger->error('Error during user creation', []);
             return new JsonResponse(
                 [
                     'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
