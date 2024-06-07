@@ -64,9 +64,11 @@ class PatchService
 
         if (!isset($mapping[$path]['object'])) {
             $fields = $this->mappingService->findFieldsCorrespondingProperty($path, $mapping);
-            $value = $this->getOperationValue($operation, $path, $mapping);
-            foreach ($fields as $field) {
-                $record[$field] = $value;
+            if ($fields !== false) {
+                $value = $this->getOperationValue($operation, $path, $mapping);
+                foreach ($fields as $field) {
+                    $record[$field] = $value;
+                }
             }
         }
 
@@ -87,8 +89,10 @@ class PatchService
 
         if (!isset($mapping[$path]['object'])) {
             $fields = $this->mappingService->findFieldsCorrespondingProperty($path, $mapping);
-            foreach ($fields as $field) {
-                $record[$field] = '';
+            if ($fields !== false) {
+                foreach ($fields as $field) {
+                    $record[$field] = '';
+                }
             }
         }
 
@@ -109,9 +113,11 @@ class PatchService
 
         if (!isset($mapping[$path]['object'])) {
             $fields = $this->mappingService->findFieldsCorrespondingProperty($path, $mapping);
-            $value = $this->getOperationValue($operation, $path, $mapping);
-            foreach ($fields as $field) {
-                $record[$field] = $value;
+            if ($fields !== false) {
+                $value = $this->getOperationValue($operation, $path, $mapping);
+                foreach ($fields as $field) {
+                    $record[$field] = $value;
+                }
             }
         }
 
@@ -177,6 +183,9 @@ class PatchService
     {
         $path = trim(str_replace('/', '.', $operation['path']), '/');
         $fields = $this->mappingService->findFieldsCorrespondingProperty($path, $mapping);
+        if ($fields === false) {
+            throw new PatchTestErrorException('Test failed');
+        }
 
         $value = $this->getOperationValue($operation, $path, $mapping);
         foreach ($fields as $field) {
