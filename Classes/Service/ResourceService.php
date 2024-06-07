@@ -53,6 +53,7 @@ class ResourceService
         [$totalResults, $result] = $repository->search(
             $queryParams,
             $configuration['mapping'],
+            $configuration['meta'],
             (int)$configuration['pid']
         );
 
@@ -178,7 +179,7 @@ class ResourceService
         array $configuration
     ): array {
         $record = $repository->find($resourceId);
-        $data = $this->patchService->apply($record, $payload, $configuration['mapping']);
+        $data = $this->patchService->apply($record, $payload, $configuration['mapping'], $configuration['meta']);
         if (!empty($data)) {
             $record = $repository->update($resourceId, $data);
         }

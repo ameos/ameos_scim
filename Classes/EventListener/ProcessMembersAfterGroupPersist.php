@@ -34,7 +34,7 @@ final class ProcessMembersAfterGroupPersist
      */
     public function __invoke(PostPersistGroupEvent $event): void
     {
-        foreach ($event->getMapping() as $property => $configuration) {
+        foreach ($event->getConfiguration()['mapping'] as $property => $configuration) {
             if (isset($configuration['object']) && $configuration['object'] === MemberObject::class) {
                 $payload = array_change_key_case($event->getPayload());
                 $property = mb_strtolower($property);
@@ -148,7 +148,12 @@ final class ProcessMembersAfterGroupPersist
             if (!empty($filters)) {
                 $filters = str_replace('value', 'id', $filters);
 
-                [, $results] = $repository->findByFilters($filters, $event->getMapping(), $event->getRecord()['pid']);
+                [, $results] = $repository->findByFilters(
+                    $filters,
+                    $event->getConfiguration()['mapping'],
+                    $event->getConfiguration()['meta'],
+                    $event->getConfiguration()['pid']
+                );
                 while ($user = $results->fetchAssociative()) {
                     $groups = array_diff(
                         array_filter(GeneralUtility::trimExplode(',', $user[$field])),

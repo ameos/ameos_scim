@@ -10,14 +10,14 @@ use Ameos\Scim\Enum\PostPersistMode;
 final class PostPersistUserEvent
 {
     /**
-     * @param array $mapping
+     * @param array $configuration
      * @param array $payload
      * @param array $record
      * @param PostPersistMode $mode
      * @param Context $context
      */
     public function __construct(
-        private readonly array $mapping,
+        private readonly array $configuration,
         private readonly array $payload,
         private readonly array $record,
         private readonly PostPersistMode $mode,
@@ -26,13 +26,13 @@ final class PostPersistUserEvent
     }
 
     /**
-     * return mapping
+     * return configuration
      *
      * @return array
      */
-    public function getMapping(): array
+    public function getConfiguration(): array
     {
-        return $this->mapping;
+        return $this->configuration;
     }
 
     /**

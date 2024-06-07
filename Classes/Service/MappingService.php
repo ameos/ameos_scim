@@ -153,9 +153,10 @@ class MappingService
      *
      * @param string $property
      * @param array $mapping
+     * @param array $meta
      * @return array|false
      */
-    public function findFieldsCorrespondingProperty(string $property, array $mapping): array|false
+    public function findFieldsCorrespondingProperty(string $property, array $mapping, array $meta): array|false
     {
         $filter = null;
         if (preg_match('/([^\[]*)\[([^\]]*)\]/', $property, $matches)) {
@@ -163,7 +164,7 @@ class MappingService
             $filter = $matches[2];
         }
 
-        $currentMapping = $mapping;
+        $currentMapping = array_merge($mapping, $meta);
         foreach (explode('.', $property) as $propertyItem) {
             foreach ($currentMapping as $key => $configuration) {
                 if (mb_strtolower($key) === mb_strtolower($propertyItem)) {

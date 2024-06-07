@@ -40,10 +40,11 @@ abstract class AbstractResourceRepository
      *
      * @param array $queryParams
      * @param array $mapping
+     * @param array $meta
      * @param int $pid
      * @return array
      */
-    public function search(array $queryParams, array $mapping, int $pid): array
+    public function search(array $queryParams, array $mapping, array $meta, int $pid): array
     {
         $startIndex = isset($queryParams['startIndex']) ? (int)$queryParams['startIndex'] : 1;
         $itemsPerPage = isset($queryParams['itemsPerPage']) ? (int)$queryParams['itemsPerPage'] : 10;
@@ -52,7 +53,7 @@ abstract class AbstractResourceRepository
         $sortOrder = 'ASC';
 
         if (isset($queryParams['sortBy'])) {
-            $sortBy = $this->mappingService->findFieldsCorrespondingProperty($queryParams['sortBy'], $mapping);
+            $sortBy = $this->mappingService->findFieldsCorrespondingProperty($queryParams['sortBy'], $mapping, $meta);
         }
         if (isset($queryParams['sortOrder'])) {
             $sortOrder = $queryParams['sortOrder'] === 'ascending' ? 'ASC' : 'DESC';
@@ -61,6 +62,7 @@ abstract class AbstractResourceRepository
         return $this->findByFilters(
             $filters,
             $mapping,
+            $meta,
             $pid,
             $startIndex,
             $itemsPerPage,
@@ -74,6 +76,7 @@ abstract class AbstractResourceRepository
      *
      * @param string $filters
      * @param array $mapping
+     * @param array $meta
      * @param int $pid
      * @param int $startIndex
      * @param int $itemsPerPage
@@ -84,6 +87,7 @@ abstract class AbstractResourceRepository
     public function findByFilters(
         ?string $filters,
         array $mapping,
+        array $meta,
         int $pid = 0,
         int $startIndex = 1,
         int $itemsPerPage = 10,
@@ -97,7 +101,7 @@ abstract class AbstractResourceRepository
         $constraints[] = $qb->expr()->eq('pid', $qb->createNamedParameter($pid, Connection::PARAM_INT));
 
         if ($filters) {
-            $filtersContraints = $this->filterService->convertFilter($filters, $qb, $mapping);
+            $filtersContraints = $this->filterService->convertFilter($filters, $qb, $mapping, $meta);
             if ($filtersContraints) {
                 $constraints[] = $qb->expr()->and(...$filtersContraints);
             }

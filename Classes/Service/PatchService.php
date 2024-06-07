@@ -28,9 +28,10 @@ class PatchService
      * @param array $record
      * @param array $payload
      * @param array $mapping
+     * @param array $meta
      * @return array
      */
-    public function apply(array $record, array $payload, array $mapping): array
+    public function apply(array $record, array $payload, array $mapping, array $meta): array
     {
         $original = $record;
 
@@ -38,12 +39,12 @@ class PatchService
         foreach ($payload['operations'] as $operation) {
             $operation = array_change_key_case($operation);
             $record = match ($operation['op']) {
-                self::OP_ADD => $this->add($record, $operation, $mapping),
-                self::OP_REMOVE => $this->remove($record, $operation, $mapping),
-                self::OP_REPLACE => $this->replace($record, $operation, $mapping),
-                self::OP_MOVE => $this->move($record, $operation, $mapping),
-                self::OP_COPY => $this->copy($record, $operation, $mapping),
-                self::OP_TEST => $this->test($record, $operation, $mapping),
+                self::OP_ADD => $this->add($record, $operation, $mapping, $meta),
+                self::OP_REMOVE => $this->remove($record, $operation, $mapping, $meta),
+                self::OP_REPLACE => $this->replace($record, $operation, $mapping, $meta),
+                self::OP_MOVE => $this->move($record, $operation, $mapping, $meta),
+                self::OP_COPY => $this->copy($record, $operation, $mapping, $meta),
+                self::OP_TEST => $this->test($record, $operation, $mapping, $meta),
             };
         }
 
@@ -56,14 +57,15 @@ class PatchService
      * @param array $record
      * @param array $operation
      * @param array $mapping
+     * @param array $meta
      * @return array
      */
-    private function add(array $record, array $operation, array $mapping): array
+    private function add(array $record, array $operation, array $mapping, array $meta): array
     {
         $path = trim(str_replace('/', '.', $operation['path']), '/');
 
         if (!isset($mapping[$path]['object'])) {
-            $fields = $this->mappingService->findFieldsCorrespondingProperty($path, $mapping);
+            $fields = $this->mappingService->findFieldsCorrespondingProperty($path, $mapping, $meta);
             if ($fields !== false) {
                 $value = $this->getOperationValue($operation, $path, $mapping);
                 foreach ($fields as $field) {
@@ -81,14 +83,15 @@ class PatchService
      * @param array $record
      * @param array $operation
      * @param array $mapping
+     * @param array $meta
      * @return array
      */
-    private function remove(array $record, array $operation, array $mapping): array
+    private function remove(array $record, array $operation, array $mapping, array $meta): array
     {
         $path = trim(str_replace('/', '.', $operation['path']), '/');
 
         if (!isset($mapping[$path]['object'])) {
-            $fields = $this->mappingService->findFieldsCorrespondingProperty($path, $mapping);
+            $fields = $this->mappingService->findFieldsCorrespondingProperty($path, $mapping, $meta);
             if ($fields !== false) {
                 foreach ($fields as $field) {
                     $record[$field] = '';
@@ -105,14 +108,15 @@ class PatchService
      * @param array $record
      * @param array $operation
      * @param array $mapping
+     * @param array $meta
      * @return array
      */
-    private function replace(array $record, array $operation, array $mapping): array
+    private function replace(array $record, array $operation, array $mapping, array $meta): array
     {
         $path = trim(str_replace('/', '.', $operation['path']), '/');
 
         if (!isset($mapping[$path]['object'])) {
-            $fields = $this->mappingService->findFieldsCorrespondingProperty($path, $mapping);
+            $fields = $this->mappingService->findFieldsCorrespondingProperty($path, $mapping, $meta);
             if ($fields !== false) {
                 $value = $this->getOperationValue($operation, $path, $mapping);
                 foreach ($fields as $field) {
@@ -130,16 +134,17 @@ class PatchService
      * @param array $record
      * @param array $operation
      * @param array $mapping
+     * @param array $meta
      * @return array
      */
-    private function move(array $record, array $operation, array $mapping): array
+    private function move(array $record, array $operation, array $mapping, array $meta): array
     {
         $from = trim(str_replace('/', '.', $operation['from']), '/');
         $path = trim(str_replace('/', '.', $operation['path']), '/');
 
         if (!isset($mapping[$path]['object'])) {
             $fromField = $this->mappingService->findFieldsCorrespondingProperty($from, $mapping)[0];
-            $pathField = $this->mappingService->findFieldsCorrespondingProperty($path, $mapping)[0];
+            $pathField = $this->mappingService->findFieldsCorrespondingProperty($path, $mapping, $meta)[0];
 
             $record[$pathField] = $record[$fromField];
             $record[$fromField] = '';
@@ -154,16 +159,17 @@ class PatchService
      * @param array $record
      * @param array $operation
      * @param array $mapping
+     * @param array $meta
      * @return array
      */
-    private function copy(array $record, array $operation, array $mapping): array
+    private function copy(array $record, array $operation, array $mapping, array $meta): array
     {
         $from = trim(str_replace('/', '.', $operation['from']), '/');
         $path = trim(str_replace('/', '.', $operation['path']), '/');
 
         if (!isset($mapping[$path]['object'])) {
             $fromField = $this->mappingService->findFieldsCorrespondingProperty($from, $mapping)[0];
-            $pathField = $this->mappingService->findFieldsCorrespondingProperty($path, $mapping)[0];
+            $pathField = $this->mappingService->findFieldsCorrespondingProperty($path, $mapping, $meta)[0];
 
             $record[$pathField] = $record[$fromField];
         }
@@ -177,12 +183,13 @@ class PatchService
      * @param array $record
      * @param array $operation
      * @param array $mapping
+     * @param array $meta
      * @return array
      */
-    private function test(array $record, array $operation, array $mapping): array
+    private function test(array $record, array $operation, array $mapping, array $meta): array
     {
         $path = trim(str_replace('/', '.', $operation['path']), '/');
-        $fields = $this->mappingService->findFieldsCorrespondingProperty($path, $mapping);
+        $fields = $this->mappingService->findFieldsCorrespondingProperty($path, $mapping, $meta);
         if ($fields === false) {
             throw new PatchTestErrorException('Test failed');
         }
@@ -203,9 +210,10 @@ class PatchService
      * @param array $operation
      * @param string $path
      * @param array $mapping
+     * @param array $meta
      * @return mixed
      */
-    private function getOperationValue(array $operation, string $path, array $mapping): mixed
+    private function getOperationValue(array $operation, string $path, array $mapping, array $meta): mixed
     {
         $configuration = $this->mappingService->findPropertyConfiguration($path, $mapping);
         $value = $operation['value'];

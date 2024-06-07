@@ -81,7 +81,7 @@ class GroupService
         );
 
         $this->eventDispatcher->dispatch(new PostPersistGroupEvent(
-            $configuration['mapping'],
+            $configuration,
             $payload,
             $resource,
             PostPersistMode::Create,
@@ -109,7 +109,7 @@ class GroupService
         );
 
         $this->eventDispatcher->dispatch(new PostPersistGroupEvent(
-            $configuration['mapping'],
+            $configuration,
             $payload,
             $resource,
             PostPersistMode::Update,
@@ -137,7 +137,7 @@ class GroupService
         );
 
         $this->eventDispatcher->dispatch(new PostPersistGroupEvent(
-            $configuration['mapping'],
+            $configuration,
             $payload,
             $resource,
             PostPersistMode::Patch,
