@@ -46,7 +46,7 @@ class MappingService
                 }
 
                 if (isset($configuration['object'])) {
-                    /** @var EvaluatorInterface */
+                    /** @var CustomObjectInterface */
                     $customObject = GeneralUtility::makeInstance($configuration['object']);
                     $value = $customObject->read($data, $configuration['arguments'] ?? [], $context);
                 }

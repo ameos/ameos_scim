@@ -161,7 +161,7 @@ class UserService
      * @param string $resourceId
      * @param array $configuration
      * @param Context $context
-     * @return array
+     * @return void
      */
     public function delete(string $resourceId, array $configuration, Context $context): void
     {

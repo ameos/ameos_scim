@@ -8,6 +8,7 @@ use Ameos\Scim\Enum\Context;
 use Doctrine\DBAL\ArrayParameterType;
 use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
 use TYPO3\CMS\Core\Database\ConnectionPool;
+use TYPO3\CMS\Core\Http\NormalizedParams;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class GroupObject implements CustomObjectInterface
@@ -34,15 +35,15 @@ class GroupObject implements CustomObjectInterface
         /** @var NormalizedParams */
         $normalizedParams = $GLOBALS['TYPO3_REQUEST']->getAttribute('normalizedParams');
         $confPath = $context === Context::Frontend ? 'fe_path' : 'be_path';
+        $table = $context === Context::Frontend ? 'fe_groups' : 'be_groups';
         $apiPath = $this->extensionConfiguration->get('scim', $confPath) . 'Groups/';
 
         $usergroups = [];
         if (isset($data['usergroup'])) {
-            // todo / be / fe
-            $qb = $this->connectionPool->getQueryBuilderForTable('fe_groups');
+            $qb = $this->connectionPool->getQueryBuilderForTable($table);
             $usergroups = $qb
                 ->select('*')
-                ->from('fe_groups')
+                ->from($table)
                 ->where(
                     $qb->expr()->in(
                         'uid',

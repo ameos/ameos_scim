@@ -165,8 +165,6 @@ class ResourceService
      * patch  an resource
      *
      * @param AbstractResourceRepository $repository
-     * @param ResourceType $resourceType
-     * @param Context $context
      * @param string $resourceId
      * @param array $payload
      * @param array $configuration
@@ -192,7 +190,7 @@ class ResourceService
      *
      * @param AbstractResourceRepository $repository
      * @param string $resourceId
-     * @return array
+     * @return void
      */
     public function delete(AbstractResourceRepository $repository, string $resourceId): void
     {

@@ -135,7 +135,7 @@ abstract class AbstractResourceRepository
     /**
      * find by scim ids
      *
-     * @param string $resourceId
+     * @param array $resourceIds
      * @return Result
      */
     public function findById(array $resourceIds): Result

@@ -31,9 +31,9 @@ class FilterService
      * @param QueryBuilder $qb
      * @param array $mapping
      * @param array $meta
-     * @return array|false
+     * @return array
      */
-    public function convertFilter(string $filter, QueryBuilder $qb, array $mapping, array $meta): array|false
+    public function convertFilter(string $filter, QueryBuilder $qb, array $mapping, array $meta): array
     {
         $constraints = [];
 
@@ -46,7 +46,7 @@ class FilterService
 
         $constraints[] = $this->convertNode($node, $qb, $mapping, $meta);
 
-        return empty($constraints) ? false : $constraints;
+        return $constraints;
     }
 
     /**

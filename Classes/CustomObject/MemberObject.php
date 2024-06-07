@@ -9,6 +9,7 @@ use Doctrine\DBAL\ArrayParameterType;
 use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
 use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
+use TYPO3\CMS\Core\Http\NormalizedParams;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class MemberObject implements CustomObjectInterface

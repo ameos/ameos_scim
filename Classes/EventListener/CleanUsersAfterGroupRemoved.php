@@ -17,9 +17,9 @@ final class CleanUsersAfterGroupRemoved
 {
     /**
      * @param FrontendUserRepository $frontendUserRepository
-     * @param BackendUserRepository $frontendUserRepository
+     * @param BackendUserRepository $backendUserRepository
      * @param FrontendGroupRepository $frontendGroupRepository
-     * @param BackendGroupRepository $frontendGroupRepository
+     * @param BackendGroupRepository $backendGroupRepository
      */
     public function __construct(
         private readonly FrontendUserRepository $frontendUserRepository,

@@ -18,7 +18,7 @@ final class ProcessMembersAfterGroupPersist
 {
     /**
      * @param FrontendUserRepository $frontendUserRepository
-     * @param BackendUserRepository $frontendUserRepository
+     * @param BackendUserRepository $backendUserRepository
      */
     public function __construct(
         private readonly FrontendUserRepository $frontendUserRepository,
@@ -68,7 +68,7 @@ final class ProcessMembersAfterGroupPersist
 
         $field = $configuration['arguments']['field_user'];
 
-        $existingResults = $repository->findByUserGroup((int)$event->getRecord()['uid']);
+        $existingResults = $repository->findByGroup((int)$event->getRecord()['uid']);
         while ($user = $existingResults->fetchAssociative()) {
             if (!in_array($user['scim_id'], $usersId)) {
                 $groups = array_diff(
@@ -102,7 +102,7 @@ final class ProcessMembersAfterGroupPersist
 
         $field = $configuration['arguments']['field_user'];
 
-        $existingResults = $repository->findByUserGroup((int)$event->getRecord()['uid']);
+        $existingResults = $repository->findByGroup((int)$event->getRecord()['uid']);
         while ($user = $existingResults->fetchAssociative()) {
             $groups = array_diff(
                 array_filter(GeneralUtility::trimExplode(',', $user[$field])),

@@ -8,6 +8,7 @@ use Ameos\Scim\Enum\Context;
 use Ameos\Scim\Exception\BadRequestException;
 use Ameos\Scim\Exception\NotImplementedException;
 use Tmilos\Lexer\Error\UnknownTokenException;
+use Tmilos\ScimFilterParser\Ast\ComparisonExpression;
 use Tmilos\ScimFilterParser\Ast\Conjunction;
 use Tmilos\ScimFilterParser\Ast\Disjunction;
 use Tmilos\ScimFilterParser\Mode;

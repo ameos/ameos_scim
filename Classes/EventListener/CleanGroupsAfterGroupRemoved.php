@@ -15,7 +15,7 @@ final class CleanGroupsAfterGroupRemoved
 {
     /**
      * @param FrontendGroupRepository $frontendGroupRepository
-     * @param BackendGroupRepository $frontendGroupRepository
+     * @param BackendGroupRepository $backendGroupRepository
      */
     public function __construct(
         private readonly FrontendGroupRepository $frontendGroupRepository,

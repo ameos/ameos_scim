@@ -143,7 +143,7 @@ class PatchService
         $path = trim(str_replace('/', '.', $operation['path']), '/');
 
         if (!isset($mapping[$path]['object'])) {
-            $fromField = $this->mappingService->findFieldsCorrespondingProperty($from, $mapping)[0];
+            $fromField = $this->mappingService->findFieldsCorrespondingProperty($from, $mapping, $meta)[0];
             $pathField = $this->mappingService->findFieldsCorrespondingProperty($path, $mapping, $meta)[0];
 
             $record[$pathField] = $record[$fromField];
@@ -168,7 +168,7 @@ class PatchService
         $path = trim(str_replace('/', '.', $operation['path']), '/');
 
         if (!isset($mapping[$path]['object'])) {
-            $fromField = $this->mappingService->findFieldsCorrespondingProperty($from, $mapping)[0];
+            $fromField = $this->mappingService->findFieldsCorrespondingProperty($from, $mapping, $meta)[0];
             $pathField = $this->mappingService->findFieldsCorrespondingProperty($path, $mapping, $meta)[0];
 
             $record[$pathField] = $record[$fromField];
@@ -210,10 +210,9 @@ class PatchService
      * @param array $operation
      * @param string $path
      * @param array $mapping
-     * @param array $meta
      * @return mixed
      */
-    private function getOperationValue(array $operation, string $path, array $mapping, array $meta): mixed
+    private function getOperationValue(array $operation, string $path, array $mapping): mixed
     {
         $configuration = $this->mappingService->findPropertyConfiguration($path, $mapping);
         $value = $operation['value'];
