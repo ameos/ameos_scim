@@ -97,10 +97,7 @@ class FilterService
 
         $v = $node->compareValue;
         if (preg_match('/[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}.*/', $v)) {
-            $datetime = new \DateTime($v);
-            if ($datetime) {
-                $v = $datetime->getTimestamp();
-            }
+            $v = (new \DateTime($v))->getTimestamp();
         }
 
         $comparisons = match ($node->operator) {

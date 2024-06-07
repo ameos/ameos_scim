@@ -6,5 +6,4 @@ namespace Ameos\Scim\Service;
 
 class BulkService
 {
-
 }
