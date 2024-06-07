@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace Ameos\Scim\CustomObject;
 
 use Ameos\Scim\Enum\Context;
+use Doctrine\DBAL\ArrayParameterType;
 use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
 use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class MemberObject implements CustomObjectInterface
 {
@@ -33,31 +35,56 @@ class MemberObject implements CustomObjectInterface
         /** @var NormalizedParams */
         $normalizedParams = $GLOBALS['TYPO3_REQUEST']->getAttribute('normalizedParams');
         $confPath = $context === Context::Frontend ? 'fe_path' : 'be_path';
-        $apiPath = $this->extensionConfiguration->get('scim', $confPath) . 'Users/';
+        $apiPath = $this->extensionConfiguration->get('scim', $confPath);
+
+        $members = [];
 
         $table = $context === Context::Frontend ? 'fe_users' : 'be_users';
         $qb = $this->connectionPool->getQueryBuilderForTable($table);
-        $users = $qb
+        $results = $qb
             ->select('*')
             ->from($table)
             ->where(
                 $qb->expr()->inSet(
-                    $configuration['field'],
+                    $configuration['field_user'],
                     $qb->createNamedParameter((int)$data['uid'], Connection::PARAM_INT)
                 )
             )
-            ->executeQuery()
-            ->fetchAllAssociative();
-
-        return array_map(
-            fn ($user) => [
+            ->executeQuery();
+        while ($user = $results->fetchAssociative()) {
+            $members[] = [
                 'value' => $user['scim_id'],
                 'display' => $user['username'],
-                '$ref' => trim($normalizedParams->getSiteUrl(), '/') . $apiPath . $user['scim_id'],
+                '$ref' => trim($normalizedParams->getSiteUrl(), '/') . $apiPath . 'Users/' . $user['scim_id'],
                 'type' => 'User'
-            ],
-            $users
-        );
+            ];
+        }
+
+        $table = $context === Context::Frontend ? 'fe_groups' : 'be_groups';
+        $qb = $this->connectionPool->getQueryBuilderForTable($table);
+        $results = $qb
+            ->select('*')
+            ->from($table)
+            ->where(
+                $qb->expr()->in(
+                    'uid',
+                    $qb->createNamedParameter(
+                        array_map('intval', GeneralUtility::trimExplode(',', $data[$configuration['field_group']])),
+                        ArrayParameterType::INTEGER
+                    )
+                )
+            )
+            ->executeQuery();
+        while ($group = $results->fetchAssociative()) {
+            $members[] = [
+                'value' => $group['scim_id'],
+                'display' => $group['title'],
+                '$ref' => trim($normalizedParams->getSiteUrl(), '/') . $apiPath . 'Groups/' . $group['scim_id'],
+                'type' => 'Group'
+            ];
+        }
+
+        return $members;
     }
 
     /**

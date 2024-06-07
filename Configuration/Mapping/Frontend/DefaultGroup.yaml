@@ -5,4 +5,5 @@ mapping:
     members:
       object: Ameos\Scim\CustomObject\MemberObject
       arguments:
-        field: usergroup
+        field_user: usergroup
+        field_group: subgroup

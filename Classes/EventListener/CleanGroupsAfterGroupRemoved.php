@@ -6,24 +6,18 @@ namespace Ameos\Scim\EventListener;
 
 use Ameos\Scim\CustomObject\MemberObject;
 use Ameos\Scim\Domain\Repository\BackendGroupRepository;
-use Ameos\Scim\Domain\Repository\BackendUserRepository;
 use Ameos\Scim\Domain\Repository\FrontendGroupRepository;
-use Ameos\Scim\Domain\Repository\FrontendUserRepository;
 use Ameos\Scim\Enum\Context;
 use Ameos\Scim\Event\PostDeleteGroupEvent;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
-final class CleanUsersAfterGroupRemoved
+final class CleanGroupsAfterGroupRemoved
 {
     /**
-     * @param FrontendUserRepository $frontendUserRepository
-     * @param BackendUserRepository $frontendUserRepository
      * @param FrontendGroupRepository $frontendGroupRepository
      * @param BackendGroupRepository $frontendGroupRepository
      */
     public function __construct(
-        private readonly FrontendUserRepository $frontendUserRepository,
-        private readonly BackendUserRepository $backendUserRepository,
         private readonly FrontendGroupRepository $frontendGroupRepository,
         private readonly BackendGroupRepository $backendGroupRepository
     ) {
@@ -37,26 +31,23 @@ final class CleanUsersAfterGroupRemoved
      */
     public function __invoke(PostDeleteGroupEvent $event): void
     {
-        $userRepository = $event->getContext() === Context::Frontend
-            ? $this->frontendUserRepository : $this->backendUserRepository;
-
         $groupRepository = $event->getContext() === Context::Frontend
             ? $this->frontendGroupRepository : $this->backendGroupRepository;
 
-        $group = $groupRepository->find($event->getRecordId(), true);
-        $results = $userRepository->findByGroup((int)$group['uid']);
-        while ($user = $results->fetchAssociative()) {
+        $removedGroup = $groupRepository->find($event->getRecordId(), true);
+        $results = $groupRepository->findByGroup((int)$removedGroup['uid']);
+        while ($group = $results->fetchAssociative()) {
             $data = [];
             foreach ($event->getMapping() as $configuration) {
                 if (isset($configuration['object']) && $configuration['object'] === MemberObject::class) {
-                    $field = $configuration['arguments']['field_user'];
-                    $usergroup = array_filter(GeneralUtility::trimExplode(',', $user[$field]));
-                    $data[$field] = implode(',', array_filter($usergroup, fn($g) => (int)$g !== (int)$group['uid']));
+                    $field = $configuration['arguments']['field_group'];
+                    $currentgroup = array_filter(GeneralUtility::trimExplode(',', $group[$field]));
+                    $data[$field] = implode(',', array_filter($currentgroup, fn($g) => (int)$g !== (int)$removedGroup['uid']));
                 }
             }
 
             if (!empty($data)) {
-                $userRepository->update($user['scim_id'], $data);
+                $groupRepository->update($group['scim_id'], $data);
             }
         }
     }

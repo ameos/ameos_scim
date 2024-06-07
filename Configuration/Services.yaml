@@ -37,3 +37,8 @@ services:
     tags:
       - name: event.listener
         identifier: 'scim/clean-users'
+
+  Ameos\Scim\EventListener\CleanGroupsAfterGroupRemoved:
+    tags:
+      - name: event.listener
+        identifier: 'scim/clean-groups'

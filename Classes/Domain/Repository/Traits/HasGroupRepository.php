@@ -9,31 +9,31 @@ use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\Query\Restriction\DeletedRestriction;
 use TYPO3\CMS\Core\Database\Query\Restriction\HiddenRestriction;
 
-trait UserRepository
+trait HasGroupRepository
 {
     /**
      * return user by group
      *
      * @param int $groupId
-     * @param string $userTable
+     * @param string $field
+     * @param string $table
      * @param bool $withDeleted
      * @return Result
      */
-    public function findByUserGroupWithTables(int $groupId, string $userTable, bool $withDeleted = false): Result
+    public function findByGroupWithFieldAndTable(int $groupId, string $field, string $table, bool $withDeleted = false): Result
     {
-        $qb = $this->connectionPool->getQueryBuilderForTable($userTable);
+        $qb = $this->connectionPool->getQueryBuilderForTable($table);
+        $qb->getRestrictions()->removeByType(HiddenRestriction::class);
         if ($withDeleted) {
-            $qb->getRestrictions()
-                ->removeByType(HiddenRestriction::class)
-                ->removeByType(DeletedRestriction::class);
+            $qb->getRestrictions()->removeByType(DeletedRestriction::class);
         }
 
         return $qb
             ->select('*')
-            ->from($userTable)
+            ->from($table)
             ->where(
                 $qb->expr()->inSet(
-                    'usergroup',
+                    $field,
                     $qb->createNamedParameter($groupId, Connection::PARAM_INT)
                 )
             )

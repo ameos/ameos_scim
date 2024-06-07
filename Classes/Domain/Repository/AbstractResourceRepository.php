@@ -222,4 +222,14 @@ abstract class AbstractResourceRepository
             ->where($qb->expr()->eq('scim_id', $qb->createNamedParameter($resourceId)))
             ->executeStatement();
     }
+
+
+    /**
+     * return resource by group
+     *
+     * @param int $groupId
+     * @param bool $withDeleted
+     * @return Result
+     */
+    abstract public function findByGroup(int $groupId, bool $withDeleted = false): Result;
 }

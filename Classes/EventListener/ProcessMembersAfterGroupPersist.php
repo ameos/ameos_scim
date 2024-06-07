@@ -66,7 +66,7 @@ final class ProcessMembersAfterGroupPersist
     ): void {
         $repository = $this->getRepository($event->getContext());
 
-        $field = $configuration['arguments']['field'];
+        $field = $configuration['arguments']['field_user'];
 
         $existingResults = $repository->findByUserGroup((int)$event->getRecord()['uid']);
         while ($user = $existingResults->fetchAssociative()) {
@@ -100,7 +100,7 @@ final class ProcessMembersAfterGroupPersist
     {
         $repository = $this->getRepository($event->getContext());
 
-        $field = $configuration['arguments']['field'];
+        $field = $configuration['arguments']['field_user'];
 
         $existingResults = $repository->findByUserGroup((int)$event->getRecord()['uid']);
         while ($user = $existingResults->fetchAssociative()) {
@@ -132,7 +132,7 @@ final class ProcessMembersAfterGroupPersist
         if (empty($usersId) && empty($filters)) {
             $this->removeAllUsers($configuration, $event);
         } else {
-            $field = $configuration['arguments']['field'];
+            $field = $configuration['arguments']['field_user'];
 
             if (!empty($usersId)) {
                 $results = $repository->findById($usersId);
@@ -175,7 +175,7 @@ final class ProcessMembersAfterGroupPersist
         array $configuration,
         PostPersistGroupEvent $event
     ): void {
-        $field = $configuration['arguments']['field'];
+        $field = $configuration['arguments']['field_user'];
         $repository = $this->getRepository($event->getContext());
         $results = $repository->findById($usersId);
         while ($user = $results->fetchAssociative()) {

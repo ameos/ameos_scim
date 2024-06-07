@@ -8,7 +8,7 @@ use Doctrine\DBAL\Result;
 
 class BackendUserRepository extends AbstractResourceRepository
 {
-    use Traits\UserRepository;
+    use Traits\HasGroupRepository;
 
     /**
      * return table name
@@ -21,14 +21,14 @@ class BackendUserRepository extends AbstractResourceRepository
     }
 
     /**
-     * return user by group
+     * return resource by group
      *
      * @param int $groupId
      * @param bool $withDeleted
      * @return Result
      */
-    public function findByUserGroup(int $groupId, bool $withDeleted = false): Result
+    public function findByGroup(int $groupId, bool $withDeleted = false): Result
     {
-        return $this->findByUserGroupWithTables($groupId, 'be_users', $withDeleted);
+        return $this->findByGroupWithFieldAndTable($groupId, 'usergroup', 'be_users', $withDeleted);
     }
 }
