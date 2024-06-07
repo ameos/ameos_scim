@@ -2,15 +2,16 @@
 
 declare(strict_types=1);
 
-namespace Ameos\Scim\Service\Frontend;
+namespace Ameos\Scim\Service;
 
+use Ameos\Scim\Domain\Repository\AbstractResourceRepository;
+use Ameos\Scim\Domain\Repository\BackendUserRepository;
 use Ameos\Scim\Domain\Repository\FrontendUserRepository;
 use Ameos\Scim\Enum\Context;
 use Ameos\Scim\Enum\PostPersistMode;
 use Ameos\Scim\Enum\ResourceType;
 use Ameos\Scim\Event\PostDeleteUserEvent;
 use Ameos\Scim\Event\PostPersistUserEvent;
-use Ameos\Scim\Service\ResourceService;
 use Psr\EventDispatcher\EventDispatcherInterface;
 
 class UserService
@@ -18,11 +19,13 @@ class UserService
     /**
      * @param ResourceService $resourceService
      * @param FrontendUserRepository $frontendUserRepository
+     * @param BackendUserRepository $backendUserRepository
      * @param EventDispatcherInterface $eventDispatcher
      */
     public function __construct(
         private readonly ResourceService $resourceService,
         private readonly FrontendUserRepository $frontendUserRepository,
+        private readonly BackendUserRepository $backendUserRepository,
         private readonly EventDispatcherInterface $eventDispatcher
     ) {
     }
@@ -32,14 +35,15 @@ class UserService
      *
      * @param array $queryParams
      * @param array $configuration
+     * @param Context $context
      * @return array
      */
-    public function search(array $queryParams, array $configuration): array
+    public function search(array $queryParams, array $configuration, Context $context): array
     {
         return $this->resourceService->search(
-            $this->frontendUserRepository,
+            $this->getRepository($context),
             ResourceType::User,
-            Context::Frontend,
+            $context,
             $queryParams,
             $configuration
         );
@@ -51,14 +55,15 @@ class UserService
      * @param string $resourceId
      * @param array $queryParams
      * @param array $configuration
+     * @param Context $context
      * @return array
      */
-    public function read(string $resourceId, array $queryParams, array $configuration): array
+    public function read(string $resourceId, array $queryParams, array $configuration, Context $context): array
     {
         return $this->resourceService->read(
-            $this->frontendUserRepository,
+            $this->getRepository($context),
             ResourceType::User,
-            Context::Frontend,
+            $context,
             $resourceId,
             $queryParams,
             $configuration
@@ -70,12 +75,13 @@ class UserService
      *
      * @param array $payload
      * @param array $configuration
+     * @param Context $context
      * @return array
      */
-    public function create(array $payload, array $configuration): array
+    public function create(array $payload, array $configuration, Context $context): array
     {
         $resource = $this->resourceService->create(
-            $this->frontendUserRepository,
+            $this->getRepository($context),
             $payload,
             $configuration
         );
@@ -85,10 +91,10 @@ class UserService
             $payload,
             $resource,
             PostPersistMode::Create,
-            Context::Frontend
+            $context
         ));
 
-        return $this->read($resource['scim_id'], [], $configuration);
+        return $this->read($resource['scim_id'], [], $configuration, $context);
     }
 
     /**
@@ -97,12 +103,13 @@ class UserService
      * @param string $resourceId
      * @param array $payload
      * @param array $configuration
+     * @param Context $context
      * @return array
      */
-    public function update(string $resourceId, array $payload, array $configuration): array
+    public function update(string $resourceId, array $payload, array $configuration, Context $context): array
     {
         $resource = $this->resourceService->update(
-            $this->frontendUserRepository,
+            $this->getRepository($context),
             $resourceId,
             $payload,
             $configuration
@@ -113,10 +120,10 @@ class UserService
             $payload,
             $resource,
             PostPersistMode::Update,
-            Context::Frontend
+            $context
         ));
 
-        return $this->read($resourceId, [], $configuration);
+        return $this->read($resourceId, [], $configuration, $context);
     }
 
     /**
@@ -125,12 +132,13 @@ class UserService
      * @param string $resourceId
      * @param array $payload
      * @param array $configuration
+     * @param Context $context
      * @return array
      */
-    public function patch(string $resourceId, array $payload, array $configuration): array
+    public function patch(string $resourceId, array $payload, array $configuration, Context $context): array
     {
         $resource = $this->resourceService->patch(
-            $this->frontendUserRepository,
+            $this->getRepository($context),
             $resourceId,
             $payload,
             $configuration
@@ -141,10 +149,10 @@ class UserService
             $payload,
             $resource,
             PostPersistMode::Patch,
-            Context::Frontend
+            $context
         ));
 
-        return $this->read($resourceId, [], $configuration);
+        return $this->read($resourceId, [], $configuration, $context);
     }
 
     /**
@@ -152,15 +160,27 @@ class UserService
      *
      * @param string $resourceId
      * @param array $configuration
+     * @param Context $context
      * @return array
      */
-    public function delete(string $resourceId, array $configuration): void
+    public function delete(string $resourceId, array $configuration, Context $context): void
     {
-        $this->resourceService->delete($this->frontendUserRepository, $resourceId);
+        $this->resourceService->delete($this->getRepository($context), $resourceId);
         $this->eventDispatcher->dispatch(new PostDeleteUserEvent(
             $resourceId,
             $configuration['mapping'],
-            Context::Frontend
+            $context
         ));
+    }
+
+    /**
+     * return repository
+     *
+     * @param Context $context
+     * @return AbstractResourceRepository
+     */
+    private function getRepository(Context $context): AbstractResourceRepository
+    {
+        return $context === Context::Frontend ? $this->frontendUserRepository : $this->backendUserRepository;
     }
 }

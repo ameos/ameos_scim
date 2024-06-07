@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Ameos\Scim\Controller\Frontend;
+namespace Ameos\Scim\Controller;
 
-use Ameos\Scim\Controller\AbstractResourceController;
+use Ameos\Scim\Enum\Context;
 use Ameos\Scim\Exception\NoResourceFoundException;
-use Ameos\Scim\Service\Frontend\UserService;
+use Ameos\Scim\Service\UserService;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
@@ -27,16 +27,18 @@ class UserController extends AbstractResourceController
      * search action
      *
      * @param ServerRequestInterface $request
+     * @param Context $context
      * @return ResponseInterface
      */
-    public function searchAction(ServerRequestInterface $request): ResponseInterface
+    public function searchAction(ServerRequestInterface $request, Context $context): ResponseInterface
     {
         try {
             $this->logger->info('Search users', $request->getQueryParams());
             return new JsonResponse(
                 $this->userService->search(
                     $request->getQueryParams(),
-                    $this->getConfiguration($request)
+                    $this->getConfiguration($request),
+                    $context
                 )
             );
         } catch (NoResourceFoundException $e) {
@@ -67,17 +69,22 @@ class UserController extends AbstractResourceController
      *
      * @param string $resourceId
      * @param ServerRequestInterface $request
+     * @param Context $context
      * @return ResponseInterface
      */
-    public function readAction(string $resourceId, ServerRequestInterface $request): ResponseInterface
-    {
+    public function readAction(
+        string $resourceId,
+        ServerRequestInterface $request,
+        Context $context
+    ): ResponseInterface {
         try {
             $this->logger->info('Read user ' . $resourceId, $request->getQueryParams());
             return new JsonResponse(
                 $this->userService->read(
                     $resourceId,
                     $request->getQueryParams(),
-                    $this->getConfiguration($request)
+                    $this->getConfiguration($request),
+                    $context
                 )
             );
         } catch (NoResourceFoundException $e) {
@@ -107,9 +114,10 @@ class UserController extends AbstractResourceController
      * create action
      *
      * @param ServerRequestInterface $request
+     * @param Context $context
      * @return ResponseInterface
      */
-    public function createAction(ServerRequestInterface $request): ResponseInterface
+    public function createAction(ServerRequestInterface $request, Context $context): ResponseInterface
     {
         $payload = json_decode($request->getBody()->getContents(), true);
         $this->logger->info('Create user', $payload);
@@ -126,7 +134,7 @@ class UserController extends AbstractResourceController
         }
 
         try {
-            $payload = $this->userService->create($payload, $this->getConfiguration($request));
+            $payload = $this->userService->create($payload, $this->getConfiguration($request), $context);
         } catch (\Exception $e) {
             $this->logger->error('Error during user creation ' . $e->getMessage(), $payload);
             return new JsonResponse(
@@ -153,10 +161,14 @@ class UserController extends AbstractResourceController
      *
      * @param string $resourceId
      * @param ServerRequestInterface $request
+     * @param Context $context
      * @return ResponseInterface
      */
-    public function patchAction(string $resourceId, ServerRequestInterface $request): ResponseInterface
-    {
+    public function patchAction(
+        string $resourceId,
+        ServerRequestInterface $request,
+        Context $context
+    ): ResponseInterface {
         $payload = json_decode($request->getBody()->getContents(), true);
         if (!$payload) {
             $this->logger->error('Error during user patch ' . $resourceId, $payload);
@@ -176,7 +188,8 @@ class UserController extends AbstractResourceController
                 $this->userService->patch(
                     $resourceId,
                     $payload,
-                    $this->getConfiguration($request)
+                    $this->getConfiguration($request),
+                    $context
                 )
             );
         } catch (NoResourceFoundException $e) {
@@ -207,10 +220,14 @@ class UserController extends AbstractResourceController
      *
      * @param string $resourceId
      * @param ServerRequestInterface $request
+     * @param Context $context
      * @return ResponseInterface
      */
-    public function updateAction(string $resourceId, ServerRequestInterface $request): ResponseInterface
-    {
+    public function updateAction(
+        string $resourceId,
+        ServerRequestInterface $request,
+        Context $context
+    ): ResponseInterface {
         $payload = json_decode($request->getBody()->getContents(), true);
         if (!$payload) {
             $this->logger->error('Error during user update ' . $resourceId, $payload);
@@ -230,7 +247,8 @@ class UserController extends AbstractResourceController
                 $this->userService->update(
                     $resourceId,
                     $payload,
-                    $this->getConfiguration($request)
+                    $this->getConfiguration($request),
+                    $context
                 )
             );
         } catch (NoResourceFoundException $e) {
@@ -261,13 +279,17 @@ class UserController extends AbstractResourceController
      *
      * @param string $resourceId
      * @param ServerRequestInterface $request
+     * @param Context $context
      * @return ResponseInterface
      */
-    public function deleteAction(string $resourceId, ServerRequestInterface $request): ResponseInterface
-    {
+    public function deleteAction(
+        string $resourceId,
+        ServerRequestInterface $request,
+        Context $context
+    ): ResponseInterface {
         try {
             $this->logger->info('Delete user ' . $resourceId);
-            $this->userService->delete($resourceId, $this->getConfiguration($request));
+            $this->userService->delete($resourceId, $this->getConfiguration($request), $context);
             return new HtmlResponse('', 204);
         } catch (\Exception $e) {
             $this->logger->error('Error during user delete ' . $e->getMessage());

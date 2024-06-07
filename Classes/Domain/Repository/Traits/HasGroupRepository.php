@@ -20,8 +20,12 @@ trait HasGroupRepository
      * @param bool $withDeleted
      * @return Result
      */
-    public function findByGroupWithFieldAndTable(int $groupId, string $field, string $table, bool $withDeleted = false): Result
-    {
+    public function findByGroupWithFieldAndTable(
+        int $groupId,
+        string $field,
+        string $table,
+        bool $withDeleted = false
+    ): Result {
         $qb = $this->connectionPool->getQueryBuilderForTable($table);
         $qb->getRestrictions()->removeByType(HiddenRestriction::class);
         if ($withDeleted) {

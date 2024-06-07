@@ -17,53 +17,81 @@ abstract class AbstractResourceController
      * search action
      *
      * @param ServerRequestInterface $request
+     * @param Context $context
      * @return ResponseInterface
      */
-    abstract public function searchAction(ServerRequestInterface $request): ResponseInterface;
+    abstract public function searchAction(
+        ServerRequestInterface $request,
+        Context $context
+    ): ResponseInterface;
 
     /**
      * read action
      *
      * @param string $resourceId
      * @param ServerRequestInterface $request
+     * @param Context $context
      * @return ResponseInterface
      */
-    abstract public function readAction(string $resourceId, ServerRequestInterface $request): ResponseInterface;
+    abstract public function readAction(
+        string $resourceId,
+        ServerRequestInterface $request,
+        Context $context
+    ): ResponseInterface;
 
     /**
      * create action
      *
      * @param ServerRequestInterface $request
+     * @param Context $context
      * @return ResponseInterface
      */
-    abstract public function createAction(ServerRequestInterface $request): ResponseInterface;
+    abstract public function createAction(
+        ServerRequestInterface $request,
+        Context $context
+    ): ResponseInterface;
 
     /**
      * patch action
      *
      * @param string $resourceId
      * @param ServerRequestInterface $request
+     * @param Context $context
      * @return ResponseInterface
      */
-    abstract public function patchAction(string $resourceId, ServerRequestInterface $request): ResponseInterface;
+    abstract public function patchAction(
+        string $resourceId,
+        ServerRequestInterface $request,
+        Context $context
+    ): ResponseInterface;
 
     /**
      * update action
      *
      * @param string $resourceId
      * @param ServerRequestInterface $request
+     * @param Context $context
      * @return ResponseInterface
      */
-    abstract public function updateAction(string $resourceId, ServerRequestInterface $request): ResponseInterface;
+    abstract public function updateAction(
+        string $resourceId,
+        ServerRequestInterface $request,
+        Context $context
+    ): ResponseInterface;
 
     /**
      * delete action
      *
      * @param string $resourceId
      * @param ServerRequestInterface $request
+     * @param Context $context
      * @return ResponseInterface
      */
-    abstract public function deleteAction(string $resourceId, ServerRequestInterface $request): ResponseInterface;
+    abstract public function deleteAction(
+        string $resourceId,
+        ServerRequestInterface $request,
+        Context $context
+    ): ResponseInterface;
 
     /**
      * return configuration from request

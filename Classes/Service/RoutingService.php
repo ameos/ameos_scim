@@ -5,10 +5,8 @@ declare(strict_types=1);
 namespace Ameos\Scim\Service;
 
 use Ameos\Scim\Controller\AbstractResourceController;
-use Ameos\Scim\Controller\Backend\GroupController as BackendGroupController;
-use Ameos\Scim\Controller\Backend\UserController as BackendUserController;
-use Ameos\Scim\Controller\Frontend\GroupController as FrontendGroupController;
-use Ameos\Scim\Controller\Frontend\UserController as FrontendUserController;
+use Ameos\Scim\Controller\GroupController;
+use Ameos\Scim\Controller\UserController;
 use Ameos\Scim\Controller\ResourceTypeController;
 use Ameos\Scim\Controller\ServiceProviderConfigController;
 use Ameos\Scim\Enum\Context;
@@ -42,11 +40,12 @@ class RoutingService
     public function route(ServerRequestInterface $request): ResponseInterface
     {
         $config = $this->extensionConfiguration->get('scim');
+        $context = $request->getAttribute('scim_context');
 
         $path = str_replace(
             '/',
             '\/',
-            $request->getAttribute('scim_context') === Context::Frontend ? $config['fe_path'] : $config['be_path']
+            $context === Context::Frontend ? $config['fe_path'] : $config['be_path']
         );
 
         $regexRoot = '/^' . $path . '(Users|Groups)\/?$/i';
@@ -57,48 +56,48 @@ class RoutingService
             preg_match($regexRoot, $request->getUri()->getPath(), $matches)
             && $request->getMethod() === self::HTTP_GET
         ) {
-            $response = $this->getControllerForSegment($matches[1], $request->getAttribute('scim_context'))
-                ->searchAction($request);
+            $response = $this->getControllerForSegment($matches[1], $context)
+                ->searchAction($request, $context);
         }
 
         if (
             preg_match($regexRoot, $request->getUri()->getPath(), $matches)
             && $request->getMethod() === self::HTTP_POST
         ) {
-            $response = $this->getControllerForSegment($matches[1], $request->getAttribute('scim_context'))
-                ->createAction($request);
+            $response = $this->getControllerForSegment($matches[1], $context)
+                ->createAction($request, $context);
         }
 
         if (
             preg_match($regexUuid, $request->getUri()->getPath(), $matches)
             && $request->getMethod() === self::HTTP_GET
         ) {
-            $response = $this->getControllerForSegment($matches[1], $request->getAttribute('scim_context'))
-                ->readAction($matches[2], $request);
+            $response = $this->getControllerForSegment($matches[1], $context)
+                ->readAction($matches[2], $request, $context);
         }
 
         if (
             preg_match($regexUuid, $request->getUri()->getPath(), $matches)
             && $request->getMethod() === self::HTTP_PATCH
         ) {
-            $response = $this->getControllerForSegment($matches[1], $request->getAttribute('scim_context'))
-                ->patchAction($matches[2], $request);
+            $response = $this->getControllerForSegment($matches[1], $context)
+                ->patchAction($matches[2], $request, $context);
         }
 
         if (
             preg_match($regexUuid, $request->getUri()->getPath(), $matches)
             && $request->getMethod() === self::HTTP_PUT
         ) {
-            $response = $this->getControllerForSegment($matches[1], $request->getAttribute('scim_context'))
-                ->updateAction($matches[2], $request);
+            $response = $this->getControllerForSegment($matches[1], $context)
+                ->updateAction($matches[2], $request, $context);
         }
 
         if (
             preg_match($regexUuid, $request->getUri()->getPath(), $matches)
             && $request->getMethod() === self::HTTP_DELETE
         ) {
-            $response = $this->getControllerForSegment($matches[1], $request->getAttribute('scim_context'))
-                ->deleteAction($matches[2], $request);
+            $response = $this->getControllerForSegment($matches[1], $context)
+                ->deleteAction($matches[2], $request, $context);
         }
 
         if (
@@ -135,11 +134,9 @@ class RoutingService
     {
         $controller = null;
         if (mb_strtolower($segment) === 'users') {
-            $fqcn = $context === Context::Frontend ? FrontendUserController::class : BackendUserController::class;
-            $controller = GeneralUtility::makeInstance($fqcn);
+            $controller = GeneralUtility::makeInstance(UserController::class);
         } elseif (mb_strtolower($segment) === 'groups') {
-            $fqcn = $context === Context::Frontend ? FrontendGroupController::class : BackendGroupController::class;
-            $controller = GeneralUtility::makeInstance($fqcn);
+            $controller = GeneralUtility::makeInstance(GroupController::class);
         }
 
         return $controller;

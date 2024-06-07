@@ -7,16 +7,10 @@ services:
   Ameos\Scim\:
     resource: '../Classes/*'
 
-  Ameos\Scim\Controller\Frontend\UserController:
+  Ameos\Scim\Controller\UserController:
     public: true
 
-  Ameos\Scim\Controller\Frontend\GroupController:
-    public: true
-
-  Ameos\Scim\Controller\Backend\UserController:
-    public: true
-
-  Ameos\Scim\Controller\Backend\GroupController:
+  Ameos\Scim\Controller\GroupController:
     public: true
 
   Ameos\Scim\CustomObject\GroupObject:

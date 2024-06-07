@@ -42,7 +42,13 @@ final class CleanGroupsAfterGroupRemoved
                 if (isset($configuration['object']) && $configuration['object'] === MemberObject::class) {
                     $field = $configuration['arguments']['field_group'];
                     $currentgroup = array_filter(GeneralUtility::trimExplode(',', $group[$field]));
-                    $data[$field] = implode(',', array_filter($currentgroup, fn($g) => (int)$g !== (int)$removedGroup['uid']));
+                    $data[$field] = implode(
+                        ',',
+                        array_filter(
+                            $currentgroup,
+                            fn($g) => (int)$g !== (int)$removedGroup['uid']
+                        )
+                    );
                 }
             }
 

@@ -2,15 +2,16 @@
 
 declare(strict_types=1);
 
-namespace Ameos\Scim\Service\Backend;
+namespace Ameos\Scim\Service;
 
+use Ameos\Scim\Domain\Repository\AbstractResourceRepository;
 use Ameos\Scim\Domain\Repository\BackendGroupRepository;
+use Ameos\Scim\Domain\Repository\FrontendGroupRepository;
 use Ameos\Scim\Enum\Context;
 use Ameos\Scim\Enum\PostPersistMode;
 use Ameos\Scim\Enum\ResourceType;
 use Ameos\Scim\Event\PostDeleteGroupEvent;
 use Ameos\Scim\Event\PostPersistGroupEvent;
-use Ameos\Scim\Service\ResourceService;
 use Psr\EventDispatcher\EventDispatcherInterface;
 
 class GroupService
@@ -18,10 +19,12 @@ class GroupService
     /**
      * @param ResourceService $resourceService
      * @param BackendGroupRepository $backendGroupRepository
+     * @param FrontendGroupRepository $frontendGroupRepository
      * @param EventDispatcherInterface $eventDispatcher
      */
     public function __construct(
         private readonly ResourceService $resourceService,
+        private readonly FrontendGroupRepository $frontendGroupRepository,
         private readonly BackendGroupRepository $backendGroupRepository,
         private readonly EventDispatcherInterface $eventDispatcher
     ) {
@@ -32,14 +35,15 @@ class GroupService
      *
      * @param array $queryParams
      * @param array $configuration
+     * @param Context $context
      * @return array
      */
-    public function search(array $queryParams, array $configuration): array
+    public function search(array $queryParams, array $configuration, Context $context): array
     {
         return $this->resourceService->search(
-            $this->backendGroupRepository,
+            $this->getRepository($context),
             ResourceType::Group,
-            Context::Backend,
+            $context,
             $queryParams,
             $configuration
         );
@@ -51,14 +55,15 @@ class GroupService
      * @param string $resourceId
      * @param array $queryParams
      * @param array $configuration
+     * @param Context $context
      * @return array
      */
-    public function read(string $resourceId, array $queryParams, array $configuration): array
+    public function read(string $resourceId, array $queryParams, array $configuration, Context $context): array
     {
         return $this->resourceService->read(
-            $this->backendGroupRepository,
+            $this->getRepository($context),
             ResourceType::Group,
-            Context::Backend,
+            $context,
             $resourceId,
             $queryParams,
             $configuration
@@ -70,12 +75,13 @@ class GroupService
      *
      * @param array $payload
      * @param array $configuration
+     * @param Context $context
      * @return array
      */
-    public function create(array $payload, array $configuration): array
+    public function create(array $payload, array $configuration, Context $context): array
     {
         $resource = $this->resourceService->create(
-            $this->backendGroupRepository,
+            $this->getRepository($context),
             $payload,
             $configuration
         );
@@ -85,10 +91,10 @@ class GroupService
             $payload,
             $resource,
             PostPersistMode::Create,
-            Context::Backend
+            $context
         ));
 
-        return $this->read($resource['scim_id'], [], $configuration);
+        return $this->read($resource['scim_id'], [], $configuration, $context);
     }
 
     /**
@@ -97,12 +103,13 @@ class GroupService
      * @param string $resourceId
      * @param array $payload
      * @param array $configuration
+     * @param Context $context
      * @return array
      */
-    public function update(string $resourceId, array $payload, array $configuration): array
+    public function update(string $resourceId, array $payload, array $configuration, Context $context): array
     {
         $resource = $this->resourceService->update(
-            $this->backendGroupRepository,
+            $this->getRepository($context),
             $resourceId,
             $payload,
             $configuration
@@ -113,10 +120,10 @@ class GroupService
             $payload,
             $resource,
             PostPersistMode::Update,
-            Context::Backend
+            $context
         ));
 
-        return $this->read($resourceId, [], $configuration);
+        return $this->read($resourceId, [], $configuration, $context);
     }
 
     /**
@@ -125,12 +132,13 @@ class GroupService
      * @param string $resourceId
      * @param array $payload
      * @param array $configuration
+     * @param Context $context
      * @return array
      */
-    public function patch(string $resourceId, array $payload, array $configuration): array
+    public function patch(string $resourceId, array $payload, array $configuration, Context $context): array
     {
         $resource = $this->resourceService->patch(
-            $this->backendGroupRepository,
+            $this->getRepository($context),
             $resourceId,
             $payload,
             $configuration
@@ -141,10 +149,10 @@ class GroupService
             $payload,
             $resource,
             PostPersistMode::Patch,
-            Context::Backend
+            $context
         ));
 
-        return $this->read($resourceId, [], $configuration);
+        return $this->read($resourceId, [], $configuration, $context);
     }
 
     /**
@@ -152,15 +160,27 @@ class GroupService
      *
      * @param string $resourceId
      * @param array $configuration
+     * @param Context $context
      * @return array
      */
-    public function delete(string $resourceId, array $configuration): void
+    public function delete(string $resourceId, array $configuration, Context $context): void
     {
-        $this->resourceService->delete($this->backendGroupRepository, $resourceId);
+        $this->resourceService->delete($this->getRepository($context), $resourceId);
         $this->eventDispatcher->dispatch(new PostDeleteGroupEvent(
             $resourceId,
             $configuration['mapping'],
-            Context::Backend
+            $context
         ));
+    }
+
+    /**
+     * return repository
+     *
+     * @param Context $context
+     * @return AbstractResourceRepository
+     */
+    private function getRepository(Context $context): AbstractResourceRepository
+    {
+        return $context === Context::Frontend ? $this->frontendGroupRepository : $this->backendGroupRepository;
     }
 }
