@@ -35,6 +35,11 @@ Activate the extension in the TYPO3 Extension Manager.
 
 ## Configuration
 
+### Add access
+
+Create a scim access record on the root page and copy the secret.
+This secret can be used as Bearer in your provider configuration.
+
 ### TypoScript Setup
 
 Navigate to the TYPO3 Backend and go to the Template module.
