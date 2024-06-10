@@ -26,112 +26,139 @@ final class MappingTest extends UnitTestCase
         return [
             'one level property' => [
                 [
-                    'externalId' => [
-                        'mapOn' => 'scim_external_id'
+                    'mapping' => [
+                        'externalId' => [
+                            'mapOn' => 'scim_external_id'
+                        ],
                     ],
+                    'meta' => [],
                 ],
                 'externalId',
                 ['scim_external_id']
             ],
             'two level property' => [
                 [
-                    'addresses' => [
-                        'locality' => [
-                            'mapOn' => 'city'
+                    'mapping' => [
+                        'addresses' => [
+                            'locality' => [
+                                'mapOn' => 'city'
+                            ],
                         ],
                     ],
+                    'meta' => [],
                 ],
                 'addresses.locality',
                 ['city']
             ],
             'filter by type on complex objects' => [
                 [
-                    'phoneNumbers' => [
-                        'object' => MultiValuedObject::class,
-                        'arguments' => [
-                            [
-                                'type' => [
-                                    'value' => 'telephone'
+                    'mapping' => [
+                        'phoneNumbers' => [
+                            'object' => MultiValuedObject::class,
+                            'arguments' => [
+                                [
+                                    'type' => [
+                                        'value' => 'telephone'
+                                    ],
+                                    'value' => [
+                                        'mapOn' => 'telephone'
+                                    ]
                                 ],
-                                'value' => [
-                                    'mapOn' => 'telephone'
-                                ]
-                            ],
-                            [
-                                'type' => [
-                                    'value' => 'fax'
-                                ],
-                                'value' => [
-                                    'mapOn' => 'fax'
+                                [
+                                    'type' => [
+                                        'value' => 'fax'
+                                    ],
+                                    'value' => [
+                                        'mapOn' => 'fax'
+                                    ]
                                 ]
                             ]
                         ]
-                    ]
+                    ],
+                    'meta' => [],
                 ],
                 'phoneNumbers[type eq "fax"]',
                 ['fax']
             ],
             'filter by type on complex objects with mutli result' => [
                 [
-                    'phoneNumbers' => [
-                        'object' => MultiValuedObject::class,
-                        'arguments' => [
-                            [
-                                'type' => [
-                                    'value' => 'mobile-work'
+                    'mapping' => [
+                        'phoneNumbers' => [
+                            'object' => MultiValuedObject::class,
+                            'arguments' => [
+                                [
+                                    'type' => [
+                                        'value' => 'mobile-work'
+                                    ],
+                                    'value' => [
+                                        'mapOn' => 'mobile_work'
+                                    ]
                                 ],
-                                'value' => [
-                                    'mapOn' => 'mobile_work'
-                                ]
-                            ],
-                            [
-                                'type' => [
-                                    'value' => 'phone-work'
+                                [
+                                    'type' => [
+                                        'value' => 'phone-work'
+                                    ],
+                                    'value' => [
+                                        'mapOn' => 'phone_work'
+                                    ]
                                 ],
-                                'value' => [
-                                    'mapOn' => 'phone_work'
-                                ]
-                            ],
-                            [
-                                'type' => [
-                                    'value' => 'mobile-home'
-                                ],
-                                'value' => [
-                                    'mapOn' => 'mobile_home'
+                                [
+                                    'type' => [
+                                        'value' => 'mobile-home'
+                                    ],
+                                    'value' => [
+                                        'mapOn' => 'mobile_home'
+                                    ]
                                 ]
                             ]
                         ]
-                    ]
+                    ],
+                    'meta' => [],
                 ],
                 'phoneNumbers[type sw "mobile"]',
                 ['mobile_work', 'mobile_home']
             ],
             'filter by primary on complex objects' => [
                 [
-                    'emails' => [
-                        'object' => MultiValuedObject::class,
-                        'arguments' => [
-                            [
-                                'primary' => [
-                                    'value' => true,
+                    'mapping' => [
+                        'emails' => [
+                            'object' => MultiValuedObject::class,
+                            'arguments' => [
+                                [
+                                    'primary' => [
+                                        'value' => true,
+                                    ],
+                                    'value' => [
+                                        'mapOn' => 'email'
+                                    ]
                                 ],
-                                'value' => [
-                                    'mapOn' => 'email'
-                                ]
-                            ],
-                            [
-                                'type' => [
-                                    'value' => 'other'
-                                ],
-                                'value' => [
-                                    'mapOn' => 'other-mail'
+                                [
+                                    'type' => [
+                                        'value' => 'other'
+                                    ],
+                                    'value' => [
+                                        'mapOn' => 'other-mail'
+                                    ]
                                 ]
                             ]
                         ]
-                    ]
+                    ],
+                    'meta' => [],
                 ],
                 'emails[primary eq true]',
                 ['email']
+            ],
+            'meta property' => [
+                [
+                    'mapping' => [],
+                    'meta' => [
+                        'lastModified' => [
+                            'mapOn' => 'tstamp'
+                        ]
+                    ],
+                ],
+                'lastModified',
+                ['tstamp']
             ],
         ];
     }
@@ -149,6 +176,13 @@ final class MappingTest extends UnitTestCase
     {
         $mappingService = new MappingService();
 
-        self::assertEquals($expectedResult, $mappingService->findFieldsCorrespondingProperty($property, $mapping, []));
+        self::assertEquals(
+            $expectedResult,
+            $mappingService->findFieldsCorrespondingProperty(
+                $property,
+                $mapping['mapping'],
+                $mapping['meta']
+            )
+        );
     }
 }
