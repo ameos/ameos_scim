@@ -86,6 +86,7 @@ class MappingService
      */
     public function payloadToData(array $payload, array $mapping): array
     {
+        $payload = array_change_key_case($payload);
         $data = [];
         foreach ($mapping as $key => $configuration) {
             $key = mb_strtolower($key);
@@ -165,22 +166,20 @@ class MappingService
         }
 
         $currentMapping = array_merge($mapping, $meta);
-        foreach (explode('.', $property) as $propertyItem) {
-            foreach ($currentMapping as $key => $configuration) {
-                if (mb_strtolower($key) === mb_strtolower($propertyItem)) {
-                    if (isset($configuration['mapOn'])) {
-                        return [$configuration['mapOn']];
-                    }
-
-                    if (isset($configuration['object'])) {
-                        /** @var CustomObjectInterface */
-                        $customObject = GeneralUtility::makeInstance($configuration['object']);
-                        return $customObject->getAssociateFields($configuration, $filter);
-                    }
-
-                    $currentMapping = $configuration;
-                    break;
+        foreach ($currentMapping as $key => $configuration) {
+            if (mb_strtolower($key) === mb_strtolower($property)) {
+                if (isset($configuration['mapOn'])) {
+                    return [$configuration['mapOn']];
                 }
+
+                if (isset($configuration['object'])) {
+                    /** @var CustomObjectInterface */
+                    $customObject = GeneralUtility::makeInstance($configuration['object']);
+                    return $customObject->getAssociateFields($configuration, $filter);
+                }
+
+                $currentMapping = $configuration;
+                break;
             }
         }
 

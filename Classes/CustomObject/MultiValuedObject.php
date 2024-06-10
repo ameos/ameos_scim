@@ -74,6 +74,10 @@ class MultiValuedObject implements CustomObjectInterface
                 foreach ($payload as $row) {
                     $value = $row['value'];
                     unset($row['value']);
+
+                    $matchingProperty = array_change_key_case($matchingProperty);
+                    $row = array_change_key_case($row);
+
                     if (empty(array_diff($matchingProperty, $row)) && empty(array_diff($row, $matchingProperty))) {
                         $data[$mapOn] = $value;
                     }
