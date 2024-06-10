@@ -73,6 +73,24 @@ final class FilterTest extends UnitTestCase
                 ],
                 '((username LIKE :dcValue1 ESCAPE ) AND (scim_external_id = :dcValue2))'
             ],
+            'userName ew "@ameos.com" AND name.givenName sw "Jean"' => [
+                'userName ew "@ameos.com" AND name.givenName sw "Jean"',
+                [
+                    'mapping' => [
+                        'username' => [
+                            'mapOn' => 'username'
+                        ],
+                        'name.givenName' => [
+                            'mapOn' => 'first_name'
+                        ],
+                        'externalId' => [
+                            'mapOn' => 'scim_external_id'
+                        ]
+                    ],
+                    'meta' => [],
+                ],
+                '((username LIKE :dcValue1 ESCAPE ) AND (first_name LIKE :dcValue2 ESCAPE ))'
+            ],
         ];
     }
 

@@ -39,10 +39,8 @@ final class FindFieldsTest extends UnitTestCase
             'two level property' => [
                 [
                     'mapping' => [
-                        'addresses' => [
-                            'locality' => [
-                                'mapOn' => 'city'
-                            ],
+                        'addresses.locality' => [
+                            'mapOn' => 'city'
                         ],
                     ],
                     'meta' => [],
