@@ -2,6 +2,7 @@
 
 namespace Ameos\Scim\Controller\Traits;
 
+use Ameos\Scim\Configuration;
 use Ameos\Scim\Enum\Context;
 use Psr\Http\Message\ServerRequestInterface;
 use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
@@ -27,8 +28,7 @@ trait ConfigurationAccess
 
         $configuration = [];
         $mappingKey = $request->getAttribute('scim_context') === Context::Frontend ? 'frontend' : 'backend';
-
-        $yamlConfiguration = (new YamlFileLoader())->load($GLOBALS['TYPO3_CONF_VARS']['SCIM']['Configuration']);
+        $yamlConfiguration = (new YamlFileLoader())->load(Configuration::getConfigurationFilepath());
         $configuration = $yamlConfiguration['scim'][$mappingKey];
 
         if ($request->getAttribute('scim_context') === Context::Frontend) {
