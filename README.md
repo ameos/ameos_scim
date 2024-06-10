@@ -47,16 +47,16 @@ Edit the plugin.tx_scim.pid constant with the ID of the storage folder containin
 
 ### Extension Settings
 
-You can configure the api path for backend and frontend in the extension settings. 
+You can activate or deactivate SCIM for backend or frontend and configure the api path in the extension settings. 
 
 ### Mapping configuration
 
 The extension comes with a preconfigured mapping
 
-You can modify this by indicating a path to a Yaml file in 
+You can modify this by indicating a path to a Yaml file in your sitepackage ext_localconf.php files with :
 
 ```
-$GLOBALS['TYPO3_CONF_VARS']['SCIM']['Configuration']
+Configuration::registerConfiguration('EXT:sitepackage/Configuration/Scim/Configuration.yaml');
 ```
 
 See default mapping in Configuration/Mapping/Configuration.yaml
@@ -68,22 +68,27 @@ See default mapping in Configuration/Mapping/Configuration.yaml
 User Endpoints:
 
 ```
-GET /v2/Users: Retrieve all users.
-GET /v2/Users/{id}: Retrieve a specific user by ID.
-POST /v2/Users: Create a new user.
-PUT /v2/Users/{id}: Replace an existing user.
-PATCH /v2/Users/{id}: Update an existing user.
-DELETE /v2/Users/{id}: Delete a user.
+GET /Users: Retrieve all users.
+GET /Users/{id}: Retrieve a specific user by ID.
+POST /Users: Create a new user.
+PUT /Users/{id}: Replace an existing user.
+PATCH /Users/{id}: Update an existing user.
+DELETE /Users/{id}: Delete a user.
 ```
 
 Group Endpoints:
 ```
-GET /v2/Groups: Retrieve all groups.
-GET /v2/Groups/{id}: Retrieve a specific group by ID.
-POST /v2/Groups: Create a new group.
-PUT /v2/Groups/{id}: Replace an existing group.
-PATCH /v2/Groups/{id}: Update an existing group.
-DELETE /v2/Groups/{id}: Delete a group.
+GET /Groups: Retrieve all groups.
+GET /Groups/{id}: Retrieve a specific group by ID.
+POST /Groups: Create a new group.
+PUT /Groups/{id}: Replace an existing group.
+PATCH /Groups/{id}: Update an existing group.
+DELETE /Groups/{id}: Delete a group.
+```
+
+Other Endpoints:
+```
+POST /Bulk: Bulk operations
 ```
 
 ### Example Requests
@@ -125,8 +130,9 @@ See the TYPO3 configuration for configuration: https://docs.typo3.org/m/typo3/re
 
 To extend the functionality of this extension, you can:
 
- * Override the SCIM controller classes.
+ * Use event.
  * Extend the mapping configuration.
+ * Xclass the extension classes.
 
 For detailed information, refer to the TYPO3 Extension Development Documentation.
 
