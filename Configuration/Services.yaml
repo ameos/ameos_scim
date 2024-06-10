@@ -13,6 +13,9 @@ services:
   Ameos\Scim\Controller\GroupController:
     public: true
 
+  Ameos\Scim\Controller\BulkController:
+    public: true
+
   Ameos\Scim\CustomObject\GroupObject:
     public: true
 

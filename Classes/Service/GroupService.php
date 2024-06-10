@@ -45,7 +45,7 @@ class GroupService
             ResourceType::Group,
             $context,
             $queryParams,
-            $configuration
+            $this->getConfiguration($configuration)
         );
     }
 
@@ -66,7 +66,7 @@ class GroupService
             $context,
             $resourceId,
             $queryParams,
-            $configuration
+            $this->getConfiguration($configuration)
         );
     }
 
@@ -83,11 +83,11 @@ class GroupService
         $resource = $this->resourceService->create(
             $this->getRepository($context),
             $payload,
-            $configuration
+            $this->getConfiguration($configuration)
         );
 
         $this->eventDispatcher->dispatch(new PostPersistGroupEvent(
-            $configuration,
+            $this->getConfiguration($configuration),
             $payload,
             $resource,
             PostPersistMode::Create,
@@ -112,11 +112,11 @@ class GroupService
             $this->getRepository($context),
             $resourceId,
             $payload,
-            $configuration
+            $this->getConfiguration($configuration)
         );
 
         $this->eventDispatcher->dispatch(new PostPersistGroupEvent(
-            $configuration,
+            $this->getConfiguration($configuration),
             $payload,
             $resource,
             PostPersistMode::Update,
@@ -141,11 +141,11 @@ class GroupService
             $this->getRepository($context),
             $resourceId,
             $payload,
-            $configuration
+            $this->getConfiguration($configuration)
         );
 
         $this->eventDispatcher->dispatch(new PostPersistGroupEvent(
-            $configuration,
+            $this->getConfiguration($configuration),
             $payload,
             $resource,
             PostPersistMode::Patch,
@@ -168,7 +168,7 @@ class GroupService
         $this->resourceService->delete($this->getRepository($context), $resourceId);
         $this->eventDispatcher->dispatch(new PostDeleteGroupEvent(
             $resourceId,
-            $configuration['mapping'],
+            $this->getConfiguration($configuration)['mapping'],
             $context
         ));
     }
@@ -182,5 +182,20 @@ class GroupService
     private function getRepository(Context $context): AbstractResourceRepository
     {
         return $context === Context::Frontend ? $this->frontendGroupRepository : $this->backendGroupRepository;
+    }
+
+    /**
+     * return configuration for group
+     *
+     * @param array $configuration
+     * @return array
+     */
+    private function getConfiguration(array $configuration): array
+    {
+        return [
+            'pid' => $configuration['pid'],
+            'mapping' => $configuration['group']['mapping'],
+            'meta' => $configuration['group']['meta'],
+        ];
     }
 }

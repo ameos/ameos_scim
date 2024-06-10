@@ -11,6 +11,7 @@ use Ameos\Scim\Domain\Repository\FrontendUserRepository;
 use Ameos\Scim\Enum\Context;
 use Ameos\Scim\Enum\PostPersistMode;
 use Ameos\Scim\Event\PostPersistGroupEvent;
+use Ameos\Scim\Registry\BulkIdRegistry;
 use Ameos\Scim\Service\PatchService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -19,10 +20,12 @@ final class ProcessMembersAfterGroupPersist
     /**
      * @param FrontendUserRepository $frontendUserRepository
      * @param BackendUserRepository $backendUserRepository
+     * @param BulkIdRegistry $bulkIdRegistry
      */
     public function __construct(
         private readonly FrontendUserRepository $frontendUserRepository,
-        private readonly BackendUserRepository $backendUserRepository
+        private readonly BackendUserRepository $backendUserRepository,
+        private readonly BulkIdRegistry $bulkIdRegistry
     ) {
     }
 
@@ -236,7 +239,15 @@ final class ProcessMembersAfterGroupPersist
      */
     private function convertPayloadToIds(array $payload): array
     {
-        return array_map(fn ($v) => $v['value'], $payload);
+        $ids = [];
+        foreach ($payload as $item) {
+            if (preg_match('/bulkId:(.*)/i', $item['value'], $matches)) {
+                $ids[] = $this->bulkIdRegistry->getResource($matches[1])['id'];
+            } else {
+                $ids[] = $item['value'];
+            }
+        }
+        return $ids;
     }
 
     /**

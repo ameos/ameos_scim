@@ -27,6 +27,11 @@ use TYPO3\CMS\Core\Http\NormalizedParams;
 class BulkService
 {
     /**
+     * @var array
+     */
+    private array $events = [];
+
+    /**
      * @param ResourceService $resourceService
      * @param BackendGroupRepository $backendGroupRepository
      * @param BackendUserRepository $backendUserRepository
@@ -56,16 +61,22 @@ class BulkService
      */
     public function execute(array $payload, array $configuration, Context $context): array
     {
+        $this->events = [];
+
         $payload = array_change_key_case($payload);
         $resources = [];
         foreach ($payload['operations'] as $operation) {
             $operation = array_change_key_case($operation);
-            $resources = match ($operation['method']) {
+            $resources[] = match ($operation['method']) {
                 RoutingService::HTTP_POST => $this->post($operation, $configuration, $context),
                 RoutingService::HTTP_PUT => $this->put($operation, $configuration, $context),
                 RoutingService::HTTP_PATCH => $this->patch($operation, $configuration, $context),
                 RoutingService::HTTP_DELETE => $this->delete($operation, $configuration, $context),
             };
+        }
+
+        foreach ($this->events as $event) {
+            $this->eventDispatcher->dispatch($event);
         }
 
         return [
@@ -89,28 +100,28 @@ class BulkService
         $resource = $this->resourceService->create(
             $this->getRepository($context, $resourceType),
             $operation['data'],
-            $configuration
+            $this->getConfiguration($configuration, $resourceType)
         );
 
         $this->bulkIdRegistry->addResource($operation['bulkid'], $resource['scim_id'], $resourceType);
 
         if ($resourceType === ResourceType::User) {
-            $this->eventDispatcher->dispatch(new PostPersistUserEvent(
-                $configuration,
+            $this->events[] = new PostPersistUserEvent(
+                $this->getConfiguration($configuration, $resourceType),
                 $operation['data'],
                 $resource,
                 PostPersistMode::Create,
                 $context
-            ));
+            );
         }
         if ($resourceType === ResourceType::Group) {
-            $this->eventDispatcher->dispatch(new PostPersistGroupEvent(
-                $configuration,
+            $this->events[] = new PostPersistGroupEvent(
+                $this->getConfiguration($configuration, $resourceType),
                 $operation['data'],
                 $resource,
                 PostPersistMode::Create,
                 $context
-            ));
+            );
         }
 
         return [
@@ -147,7 +158,7 @@ class BulkService
             $this->getRepository($context, $resourceType),
             $resourceId,
             $operation['data'],
-            $configuration
+            $this->getConfiguration($configuration, $resourceType)
         );
 
 
@@ -156,22 +167,22 @@ class BulkService
         }
 
         if ($resourceType === ResourceType::User) {
-            $this->eventDispatcher->dispatch(new PostPersistUserEvent(
-                $configuration,
+            $this->events[] = new PostPersistUserEvent(
+                $this->getConfiguration($configuration, $resourceType),
                 $operation['data'],
                 $resource,
                 PostPersistMode::Update,
                 $context
-            ));
+            );
         }
         if ($resourceType === ResourceType::Group) {
-            $this->eventDispatcher->dispatch(new PostPersistGroupEvent(
-                $configuration,
+            $this->events[] = new PostPersistGroupEvent(
+                $this->getConfiguration($configuration, $resourceType),
                 $operation['data'],
                 $resource,
                 PostPersistMode::Update,
                 $context
-            ));
+            );
         }
 
         return [
@@ -207,7 +218,7 @@ class BulkService
             $this->getRepository($context, $resourceType),
             $resourceId,
             $operation['data'],
-            $configuration
+            $this->getConfiguration($configuration, $resourceType)
         );
 
         if (isset($operation['bulkid'])) {
@@ -215,22 +226,22 @@ class BulkService
         }
 
         if ($resourceType === ResourceType::User) {
-            $this->eventDispatcher->dispatch(new PostPersistUserEvent(
-                $configuration,
+            $this->events[] = new PostPersistUserEvent(
+                $this->getConfiguration($configuration, $resourceType),
                 $operation['data'],
                 $resource,
                 PostPersistMode::Patch,
                 $context
-            ));
+            );
         }
         if ($resourceType === ResourceType::Group) {
-            $this->eventDispatcher->dispatch(new PostPersistGroupEvent(
-                $configuration,
+            $this->events[] = new PostPersistGroupEvent(
+                $this->getConfiguration($configuration, $resourceType),
                 $operation['data'],
                 $resource,
                 PostPersistMode::Patch,
                 $context
-            ));
+            );
         }
 
         return [
@@ -262,21 +273,20 @@ class BulkService
             throw new NoResourceFoundException($resourceType->value . ' not found');
         }
 
-
         $this->resourceService->delete($this->getRepository($context, $resourceType), $resourceId);
         if ($resourceType === ResourceType::User) {
-            $this->eventDispatcher->dispatch(new PostDeleteUserEvent(
+            $this->events[] = new PostDeleteUserEvent(
                 $resourceId,
-                $configuration['mapping'],
+                $this->getConfiguration($configuration, $resourceType)['mapping'],
                 $context
-            ));
+            );
         }
         if ($resourceType === ResourceType::Group) {
-            $this->eventDispatcher->dispatch(new PostDeleteGroupEvent(
+            $this->events[] = new PostDeleteGroupEvent(
                 $resourceId,
-                $configuration['mapping'],
+                $this->getConfiguration($configuration, $resourceType)['mapping'],
                 $context
-            ));
+            );
         }
 
         return [
@@ -338,5 +348,29 @@ class BulkService
         $apiPath = $this->extensionConfiguration->get('scim', $pathConf) . $resourceType->value . '/';
 
         return trim($normalizedParams->getSiteUrl(), '/') . $apiPath . $resourceId;
+    }
+
+    /**
+     * return configuration for a resource type
+     *
+     * @param array $configuration
+     * @param ResourceType $resourceType
+     * @return array
+     */
+    private function getConfiguration(array $configuration, ResourceType $resourceType): array
+    {
+        return match ($resourceType) {
+            ResourceType::Group => [
+                'pid' => $configuration['pid'],
+                'mapping' => $configuration['group']['mapping'],
+                'meta' => $configuration['group']['meta'],
+            ],
+            ResourceType::User => [
+                'pid' => $configuration['pid'],
+                'mapping' => $configuration['user']['mapping'],
+                'meta' => $configuration['user']['meta'],
+            ],
+            default => $configuration,
+        };
     }
 }

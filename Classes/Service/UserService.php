@@ -45,7 +45,7 @@ class UserService
             ResourceType::User,
             $context,
             $queryParams,
-            $configuration
+            $this->getConfiguration($configuration)
         );
     }
 
@@ -66,7 +66,7 @@ class UserService
             $context,
             $resourceId,
             $queryParams,
-            $configuration
+            $this->getConfiguration($configuration)
         );
     }
 
@@ -83,11 +83,11 @@ class UserService
         $resource = $this->resourceService->create(
             $this->getRepository($context),
             $payload,
-            $configuration
+            $this->getConfiguration($configuration)
         );
 
         $this->eventDispatcher->dispatch(new PostPersistUserEvent(
-            $configuration,
+            $this->getConfiguration($configuration),
             $payload,
             $resource,
             PostPersistMode::Create,
@@ -112,11 +112,11 @@ class UserService
             $this->getRepository($context),
             $resourceId,
             $payload,
-            $configuration
+            $this->getConfiguration($configuration)
         );
 
         $this->eventDispatcher->dispatch(new PostPersistUserEvent(
-            $configuration,
+            $this->getConfiguration($configuration),
             $payload,
             $resource,
             PostPersistMode::Update,
@@ -141,11 +141,11 @@ class UserService
             $this->getRepository($context),
             $resourceId,
             $payload,
-            $configuration
+            $this->getConfiguration($configuration)
         );
 
         $this->eventDispatcher->dispatch(new PostPersistUserEvent(
-            $configuration,
+            $this->getConfiguration($configuration),
             $payload,
             $resource,
             PostPersistMode::Patch,
@@ -168,7 +168,7 @@ class UserService
         $this->resourceService->delete($this->getRepository($context), $resourceId);
         $this->eventDispatcher->dispatch(new PostDeleteUserEvent(
             $resourceId,
-            $configuration['mapping'],
+            $this->getConfiguration($configuration)['mapping'],
             $context
         ));
     }
@@ -182,5 +182,20 @@ class UserService
     private function getRepository(Context $context): AbstractResourceRepository
     {
         return $context === Context::Frontend ? $this->frontendUserRepository : $this->backendUserRepository;
+    }
+
+    /**
+     * return configuration for user
+     *
+     * @param array $configuration
+     * @return array
+     */
+    private function getConfiguration(array $configuration): array
+    {
+        return [
+            'pid' => $configuration['pid'],
+            'mapping' => $configuration['user']['mapping'],
+            'meta' => $configuration['user']['meta'],
+        ];
     }
 }

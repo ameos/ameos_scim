@@ -96,14 +96,14 @@ class RoutingService
         }
 
         if (
-            preg_match('/^' . $path . 'ResourceTypes$/i', $request->getUri()->getPath())
+            preg_match('/^' . $path . 'ResourceTypes\/?$/i', $request->getUri()->getPath())
             && $request->getMethod() === self::HTTP_GET
         ) {
             $response = GeneralUtility::makeInstance(ResourceTypeController::class)->indexAction($request);
         }
 
         if (
-            preg_match('/^' . $path . 'Bulk$/i', $request->getUri()->getPath())
+            preg_match('/^' . $path . 'Bulk\/?$/i', $request->getUri()->getPath())
             && $request->getMethod() === self::HTTP_POST
         ) {
             $response = GeneralUtility::makeInstance(BulkController::class)->bulkAction($request, $context);
@@ -111,8 +111,8 @@ class RoutingService
 
         if (
             (
-                preg_match('/^' . $path . 'ServiceProviderConfig$/i', $request->getUri()->getPath())
-                || preg_match('/^' . $path . 'ServiceConfiguration$/i', $request->getUri()->getPath())
+                preg_match('/^' . $path . 'ServiceProviderConfig\/?$/i', $request->getUri()->getPath())
+                || preg_match('/^' . $path . 'ServiceConfiguration\/?$/i', $request->getUri()->getPath())
             ) && $request->getMethod() === self::HTTP_GET
         ) {
             $response = GeneralUtility::makeInstance(ServiceProviderConfigController::class)->indexAction($request);

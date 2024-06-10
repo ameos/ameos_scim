@@ -26,18 +26,10 @@ trait ConfigurationAccess
         );
 
         $configuration = [];
-        if (preg_match('/' . $baseRegex . '([a-zA-Z]*)\/?.*/i', $request->getUri()->getPath(), $matches)) {
-            $mappingKey = match (mb_strtolower($matches[1])) {
-                'users' => $request->getAttribute('scim_context') === Context::Frontend
-                    ? 'frontend.user' : 'backend.user',
-                'groups' => $request->getAttribute('scim_context') === Context::Frontend
-                    ? 'frontend.group' : 'backend.group',
-            };
+        $mappingKey = $request->getAttribute('scim_context') === Context::Frontend ? 'frontend' : 'backend';
 
-            $yamlConfiguration = (new YamlFileLoader())->load($GLOBALS['TYPO3_CONF_VARS']['SCIM']['Configuration']);
-            $configuration['mapping'] = $yamlConfiguration['scim'][$mappingKey]['mapping'];
-            $configuration['meta'] = $yamlConfiguration['scim'][$mappingKey]['meta'];
-        }
+        $yamlConfiguration = (new YamlFileLoader())->load($GLOBALS['TYPO3_CONF_VARS']['SCIM']['Configuration']);
+        $configuration = $yamlConfiguration['scim'][$mappingKey];
 
         if ($request->getAttribute('scim_context') === Context::Frontend) {
             $typoscript = $request->getAttribute('frontend.typoscript')

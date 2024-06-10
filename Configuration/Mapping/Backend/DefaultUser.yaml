@@ -1,27 +1,28 @@
 scim:
-  backend.user:
-    meta:
-      created:
-        mapOn: crdate
-      lastModified:
-        mapOn: tstamp
-    mapping:
-      userName:
-        mapOn: username
-      name.formatted:
-        mapOn: realName
-      userType: 
-        value: internal
-      active:
-        mapOn: disable
-        cast: bool
-        toggle: true
-      emails:
-        object: Ameos\Scim\CustomObject\MultiValuedObject
-        arguments:
-          - primary:
-              value: true
-            value: 
-              mapOn: email
-      externalId:
-        mapOn: scim_external_id
+  backend:
+    user:
+      meta:
+        created:
+          mapOn: crdate
+        lastModified:
+          mapOn: tstamp
+      mapping:
+        userName:
+          mapOn: username
+        name.formatted:
+          mapOn: realName
+        userType: 
+          value: internal
+        active:
+          mapOn: disable
+          cast: bool
+          toggle: true
+        emails:
+          object: Ameos\Scim\CustomObject\MultiValuedObject
+          arguments:
+            - primary:
+                value: true
+              value: 
+                mapOn: email
+        externalId:
+          mapOn: scim_external_id

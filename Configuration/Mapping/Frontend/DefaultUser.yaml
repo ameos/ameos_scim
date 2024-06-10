@@ -1,56 +1,57 @@
 scim:
-  frontend.user:
-    meta:
-      created:
-        mapOn: crdate
-      lastModified:
-        mapOn: tstamp
-    mapping:
-      userName:
-        mapOn: username
-      name.formatted:
-        mapOn: name
-      name.familyName:
-        mapOn: last_name
-      name.givenName:
-        mapOn: first_name
-      name.middleName:
-        mapOn: middle_name
-      title: 
-        mapOn: title
-      userType: 
-        value: external
-      active:
-        mapOn: disable
-        cast: bool
-        toggle: true
-      emails:
-        object: Ameos\Scim\CustomObject\MultiValuedObject
-        arguments:
-          - primary:
-              value: true
-            value: 
-              mapOn: email
-      phoneNumbers:
-        object: Ameos\Scim\CustomObject\MultiValuedObject
-        arguments:
-          - type:
-              value: telephone
-            value: 
-              mapOn: telephone
-          - type:
-              value: fax
-            value: 
-              mapOn: fax
-      addresses.streetAddress:
-        mapOn: address
-      addresses.locality:
-        mapOn: city
-      addresses.postalCode:
-        mapOn: zip
-      addresses.country:
-        mapOn: country
-      externalId:
-        mapOn: scim_external_id
-      groups:
-        object: Ameos\Scim\CustomObject\GroupObject
+  frontend:
+    user:
+      meta:
+        created:
+          mapOn: crdate
+        lastModified:
+          mapOn: tstamp
+      mapping:
+        userName:
+          mapOn: username
+        name.formatted:
+          mapOn: name
+        name.familyName:
+          mapOn: last_name
+        name.givenName:
+          mapOn: first_name
+        name.middleName:
+          mapOn: middle_name
+        title: 
+          mapOn: title
+        userType: 
+          value: external
+        active:
+          mapOn: disable
+          cast: bool
+          toggle: true
+        emails:
+          object: Ameos\Scim\CustomObject\MultiValuedObject
+          arguments:
+            - primary:
+                value: true
+              value: 
+                mapOn: email
+        phoneNumbers:
+          object: Ameos\Scim\CustomObject\MultiValuedObject
+          arguments:
+            - type:
+                value: telephone
+              value: 
+                mapOn: telephone
+            - type:
+                value: fax
+              value: 
+                mapOn: fax
+        addresses.streetAddress:
+          mapOn: address
+        addresses.locality:
+          mapOn: city
+        addresses.postalCode:
+          mapOn: zip
+        addresses.country:
+          mapOn: country
+        externalId:
+          mapOn: scim_external_id
+        groups:
+          object: Ameos\Scim\CustomObject\GroupObject

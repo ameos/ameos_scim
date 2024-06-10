@@ -43,7 +43,7 @@ class BulkController
                 )
             );
         } catch (\Exception $e) {
-            $this->logger->error('Error during bulk action', $$payload);
+            $this->logger->error('Error during bulk action', $payload);
             return new JsonResponse(
                 [
                     'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
