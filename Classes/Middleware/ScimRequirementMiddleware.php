@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Ameos\Scim\Middleware;
 
+use Ameos\Scim\Enum\Context;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
@@ -31,11 +32,17 @@ class ScimRequirementMiddleware implements MiddlewareInterface
     {
         $config = $this->extensionConfiguration->get('scim');
 
-        if (preg_match('/^' . str_replace('/', '\/', $config['be_path']) . '.*/', $request->getUri()->getPath())) {
-            $request = $this->enrichingRequest($request, 'backend');
+        if (
+            (bool)$config['be_activation'] === true
+            && preg_match('/^' . str_replace('/', '\/', $config['be_path']) . '.*/', $request->getUri()->getPath())
+        ) {
+            $request = $this->enrichingRequest($request, Context::Backend);
         }
-        if (preg_match('/^' . str_replace('/', '\/', $config['fe_path']) . '.*/', $request->getUri()->getPath())) {
-            $request = $this->enrichingRequest($request, 'frontend');
+        if (
+            (bool)$config['fe_activation'] === true
+            && preg_match('/^' . str_replace('/', '\/', $config['fe_path']) . '.*/', $request->getUri()->getPath())
+        ) {
+            $request = $this->enrichingRequest($request, Context::Frontend);
         }
 
         return $handler->handle($request);
@@ -45,10 +52,10 @@ class ScimRequirementMiddleware implements MiddlewareInterface
      * enriching scim request
      *
      * @param ServerRequestInterface $request
-     * @param string $context
+     * @param Context $context
      * @return ServerRequestInterface $request
      */
-    private function enrichingRequest(ServerRequestInterface $request, string $context): ServerRequestInterface
+    private function enrichingRequest(ServerRequestInterface $request, Context $context): ServerRequestInterface
     {
         $queryParams = $request->getQueryParams();
         $queryParams['id'] = $request->getAttribute('site')->getRootPageId();

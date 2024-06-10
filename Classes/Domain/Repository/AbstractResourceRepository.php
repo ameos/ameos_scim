@@ -6,9 +6,13 @@ namespace Ameos\Scim\Domain\Repository;
 
 use Ameos\Scim\Service\FilterService;
 use Ameos\Scim\Service\MappingService;
+use Doctrine\DBAL\ArrayParameterType;
+use Doctrine\DBAL\Result;
 use Symfony\Component\Uid\UuidV6;
 use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
+use TYPO3\CMS\Core\Database\Query\Restriction\DeletedRestriction;
+use TYPO3\CMS\Core\Database\Query\Restriction\HiddenRestriction;
 
 abstract class AbstractResourceRepository
 {
@@ -20,7 +24,7 @@ abstract class AbstractResourceRepository
     public function __construct(
         private readonly MappingService $mappingService,
         private readonly FilterService $filterService,
-        private readonly ConnectionPool $connectionPool
+        protected readonly ConnectionPool $connectionPool
     ) {
     }
 
@@ -36,32 +40,70 @@ abstract class AbstractResourceRepository
      *
      * @param array $queryParams
      * @param array $mapping
+     * @param array $meta
      * @param int $pid
      * @return array
      */
-    public function search(array $queryParams, array $mapping, int $pid): array
+    public function search(array $queryParams, array $mapping, array $meta, int $pid): array
     {
         $startIndex = isset($queryParams['startIndex']) ? (int)$queryParams['startIndex'] : 1;
         $itemsPerPage = isset($queryParams['itemsPerPage']) ? (int)$queryParams['itemsPerPage'] : 10;
+        $filters = $queryParams['filter'] ?? null;
         $sortBy = null;
         $sortOrder = 'ASC';
 
         if (isset($queryParams['sortBy'])) {
-            $sortBy = $this->mappingService->findField($queryParams['sortBy'], $mapping);
+            $sortBy = $this->mappingService->findFieldsCorrespondingProperty($queryParams['sortBy'], $mapping, $meta);
         }
         if (isset($queryParams['sortOrder'])) {
             $sortOrder = $queryParams['sortOrder'] === 'ascending' ? 'ASC' : 'DESC';
         }
 
+        return $this->findByFilters(
+            $filters,
+            $mapping,
+            $meta,
+            $pid,
+            $startIndex,
+            $itemsPerPage,
+            $sortBy,
+            $sortOrder
+        );
+    }
+
+    /**
+     * find by filters
+     *
+     * @param string $filters
+     * @param array $mapping
+     * @param array $meta
+     * @param int $pid
+     * @param int $startIndex
+     * @param int $itemsPerPage
+     * @param array $sortBy
+     * @param string $sortOrder
+     * @return array
+     */
+    public function findByFilters(
+        ?string $filters,
+        array $mapping,
+        array $meta,
+        int $pid = 0,
+        int $startIndex = 1,
+        int $itemsPerPage = 10,
+        ?array $sortBy = null,
+        string $sortOrder = 'ASC'
+    ): array {
         $qb = $this->connectionPool->getQueryBuilderForTable($this->getTable());
+        $qb->getRestrictions()->removeByType(HiddenRestriction::class);
 
         $constraints = [];
         $constraints[] = $qb->expr()->eq('pid', $qb->createNamedParameter($pid, Connection::PARAM_INT));
 
-        if (isset($queryParams['filter'])) {
-            $filters = $this->filterService->convertFilter($queryParams['filter'], $qb, $mapping);
-            if ($filters) {
-                $constraints[] = $qb->expr()->and(...$filters);
+        if ($filters) {
+            $filtersContraints = $this->filterService->convertFilter($filters, $qb, $mapping, $meta);
+            if ($filtersContraints) {
+                $constraints[] = $qb->expr()->and(...$filtersContraints);
             }
         }
 
@@ -78,7 +120,9 @@ abstract class AbstractResourceRepository
             ->setFirstResult($startIndex - 1);
 
         if ($sortBy) {
-            $qb->orderBy($sortBy, $sortOrder);
+            foreach ($sortBy as $sortByItem) {
+                $qb->addOrderBy($sortByItem, $sortOrder);
+            }
         } else {
             $qb->orderBy('uid', $sortOrder);
         }
@@ -89,32 +133,57 @@ abstract class AbstractResourceRepository
     }
 
     /**
-     * detail an user
+     * find by scim ids
      *
-     * @param string $userId
-     * @param array $queryParams
-     * @param array $configuration
-     * @return array|false
+     * @param array $resourceIds
+     * @return Result
      */
-    public function read(string $userId): array|false
+    public function findById(array $resourceIds): Result
     {
         $qb = $this->connectionPool->getQueryBuilderForTable($this->getTable());
+        $qb->getRestrictions()->removeByType(HiddenRestriction::class);
         return $qb
             ->select('*')
             ->from($this->getTable())
-            ->where($qb->expr()->eq('scim_id', $qb->createNamedParameter($userId)))
+            ->where(
+                $qb->expr()->in(
+                    'scim_id',
+                    $qb->createNamedParameter($resourceIds, ArrayParameterType::STRING)
+                )
+            )
+            ->executeQuery();
+    }
+
+    /**
+     * find a resource
+     *
+     * @param string $resourceId
+     * @param bool $withDeleted
+     * @return array|false
+     */
+    public function find(string $resourceId, bool $withDeleted = false): array|false
+    {
+        $qb = $this->connectionPool->getQueryBuilderForTable($this->getTable());
+        $qb->getRestrictions()->removeByType(HiddenRestriction::class);
+        if ($withDeleted) {
+            $qb->getRestrictions()->removeByType(DeletedRestriction::class);
+        }
+        return $qb
+            ->select('*')
+            ->from($this->getTable())
+            ->where($qb->expr()->eq('scim_id', $qb->createNamedParameter($resourceId)))
             ->executeQuery()
             ->fetchAssociative();
     }
 
     /**
-     * create an user
+     * create a resource
      *
      * @param array $data
      * @param int $pid
-     * @return string
+     * @return array
      */
-    public function create(array $data, int $pid): string
+    public function create(array $data, int $pid): array
     {
         $data['scim_id'] = UuidV6::generate();
         $data['crdate'] = time();
@@ -122,37 +191,49 @@ abstract class AbstractResourceRepository
         $data['pid'] = $pid;
         $connection = $this->connectionPool->getConnectionForTable($this->getTable());
         $connection->insert($this->getTable(), $data);
-        return $data['scim_id'];
+        $data['uid'] = (int)$connection->lastInsertId($this->getTable());
+        return $data;
     }
 
     /**
-     * update an user
+     * update a resource
      *
-     * @param string $userId
+     * @param string $resourceId
      * @param array $data
-     * @return string
+     * @return array
      */
-    public function update(string $userId, array $data): string
+    public function update(string $resourceId, array $data): array
     {
         $data['tstamp'] = time();
         $connection = $this->connectionPool->getConnectionForTable($this->getTable());
-        $connection->update($this->getTable(), $data, ['scim_id' => $userId]);
-        return $userId;
+        $connection->update($this->getTable(), $data, ['scim_id' => $resourceId]);
+        return $this->find($resourceId);
     }
 
     /**
-     * delete  an user
+     * delete a resource
      *
-     * @param string $userId
+     * @param string $resourceId
      * @return void
      */
-    public function delete(string $userId): void
+    public function delete(string $resourceId): void
     {
         $qb = $this->connectionPool->getQueryBuilderForTable($this->getTable());
+        $qb->getRestrictions()->removeByType(HiddenRestriction::class);
         $qb
             ->update($this->getTable())
             ->set('deleted', 1, true, Connection::PARAM_INT)
-            ->where($qb->expr()->eq('scim_id', $qb->createNamedParameter($userId)))
+            ->where($qb->expr()->eq('scim_id', $qb->createNamedParameter($resourceId)))
             ->executeStatement();
     }
+
+
+    /**
+     * return resource by group
+     *
+     * @param int $groupId
+     * @param bool $withDeleted
+     * @return Result
+     */
+    abstract public function findByGroup(int $groupId, bool $withDeleted = false): Result;
 }

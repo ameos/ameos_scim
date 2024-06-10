@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Ameos\Scim\Controller\Backend;
+namespace Ameos\Scim\Controller;
 
-use Ameos\Scim\Controller\AbstractResourceController;
+use Ameos\Scim\Enum\Context;
 use Ameos\Scim\Exception\NoResourceFoundException;
-use Ameos\Scim\Service\Backend\GroupService;
+use Ameos\Scim\Service\UserService;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
@@ -14,10 +14,10 @@ use TYPO3\CMS\Core\Http\HtmlResponse;
 use TYPO3\CMS\Core\Http\JsonResponse;
 use TYPO3\CMS\Core\Log\Channel;
 
-class GroupController extends AbstractResourceController
+class UserController extends AbstractResourceController
 {
     public function __construct(
-        private readonly GroupService $groupService,
+        private readonly UserService $userService,
         #[Channel('scim')]
         private readonly LoggerInterface $logger
     ) {
@@ -27,20 +27,22 @@ class GroupController extends AbstractResourceController
      * search action
      *
      * @param ServerRequestInterface $request
+     * @param Context $context
      * @return ResponseInterface
      */
-    public function searchAction(ServerRequestInterface $request): ResponseInterface
+    public function searchAction(ServerRequestInterface $request, Context $context): ResponseInterface
     {
         try {
-            $this->logger->info('Search groups', $request->getQueryParams());
+            $this->logger->info('Search users', $request->getQueryParams());
             return new JsonResponse(
-                $this->groupService->search(
+                $this->userService->search(
                     $request->getQueryParams(),
-                    $this->getConfiguration($request)
+                    $this->getConfiguration($request),
+                    $context
                 )
             );
         } catch (NoResourceFoundException $e) {
-            $this->logger->warning('No group found', $request->getQueryParams());
+            $this->logger->warning('No user found', $request->getQueryParams());
             return new JsonResponse(
                 [
                     'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
@@ -50,7 +52,7 @@ class GroupController extends AbstractResourceController
                 404
             );
         } catch (\Exception $e) {
-            $this->logger->error('Error during group search', $request->getQueryParams());
+            $this->logger->error('Error during user search', $request->getQueryParams());
             return new JsonResponse(
                 [
                     'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
@@ -67,21 +69,26 @@ class GroupController extends AbstractResourceController
      *
      * @param string $resourceId
      * @param ServerRequestInterface $request
+     * @param Context $context
      * @return ResponseInterface
      */
-    public function readAction(string $resourceId, ServerRequestInterface $request): ResponseInterface
-    {
+    public function readAction(
+        string $resourceId,
+        ServerRequestInterface $request,
+        Context $context
+    ): ResponseInterface {
         try {
-            $this->logger->info('Read group ' . $resourceId, $request->getQueryParams());
+            $this->logger->info('Read user ' . $resourceId, $request->getQueryParams());
             return new JsonResponse(
-                $this->groupService->read(
+                $this->userService->read(
                     $resourceId,
                     $request->getQueryParams(),
-                    $this->getConfiguration($request)
+                    $this->getConfiguration($request),
+                    $context
                 )
             );
         } catch (NoResourceFoundException $e) {
-            $this->logger->warning('No group found', $request->getQueryParams());
+            $this->logger->warning('No user found', $request->getQueryParams());
             return new JsonResponse(
                 [
                     'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
@@ -91,7 +98,7 @@ class GroupController extends AbstractResourceController
                 404
             );
         } catch (\Exception $e) {
-            $this->logger->error('Error during group fetch ' . $resourceId, $request->getQueryParams());
+            $this->logger->error('Error during user fetch ' . $resourceId, $request->getQueryParams());
             return new JsonResponse(
                 [
                     'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
@@ -107,14 +114,15 @@ class GroupController extends AbstractResourceController
      * create action
      *
      * @param ServerRequestInterface $request
+     * @param Context $context
      * @return ResponseInterface
      */
-    public function createAction(ServerRequestInterface $request): ResponseInterface
+    public function createAction(ServerRequestInterface $request, Context $context): ResponseInterface
     {
         $payload = json_decode($request->getBody()->getContents(), true);
-        $this->logger->info('Create group', $payload);
+        $this->logger->info('Create user', []);
         if (!$payload) {
-            $this->logger->error('Error during group creation', $payload);
+            $this->logger->error('Error during user creation', []);
             return new JsonResponse(
                 [
                     'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
@@ -126,9 +134,9 @@ class GroupController extends AbstractResourceController
         }
 
         try {
-            $payload = $this->groupService->create($payload, $this->getConfiguration($request));
+            $payload = $this->userService->create($payload, $this->getConfiguration($request), $context);
         } catch (\Exception $e) {
-            $this->logger->error('Error during group creation ' . $e->getMessage(), $payload);
+            $this->logger->error('Error during user creation ' . $e->getMessage(), $payload);
             return new JsonResponse(
                 [
                     'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
@@ -153,13 +161,17 @@ class GroupController extends AbstractResourceController
      *
      * @param string $resourceId
      * @param ServerRequestInterface $request
+     * @param Context $context
      * @return ResponseInterface
      */
-    public function patchAction(string $resourceId, ServerRequestInterface $request): ResponseInterface
-    {
+    public function patchAction(
+        string $resourceId,
+        ServerRequestInterface $request,
+        Context $context
+    ): ResponseInterface {
         $payload = json_decode($request->getBody()->getContents(), true);
         if (!$payload) {
-            $this->logger->error('Error during group patch ' . $resourceId, $payload);
+            $this->logger->error('Error during user patch ' . $resourceId, $payload);
             return new JsonResponse(
                 [
                     'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
@@ -171,16 +183,17 @@ class GroupController extends AbstractResourceController
         }
 
         try {
-            $this->logger->info('Patch group ' . $resourceId, $payload);
+            $this->logger->info('Patch user ' . $resourceId, $payload);
             return new JsonResponse(
-                $this->groupService->patch(
+                $this->userService->patch(
                     $resourceId,
                     $payload,
-                    $this->getConfiguration($request)
+                    $this->getConfiguration($request),
+                    $context
                 )
             );
         } catch (NoResourceFoundException $e) {
-            $this->logger->warning('No group found ' . $resourceId, $payload);
+            $this->logger->warning('No user found ' . $resourceId, $payload);
             return new JsonResponse(
                 [
                     'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
@@ -190,7 +203,7 @@ class GroupController extends AbstractResourceController
                 404
             );
         } catch (\Exception $e) {
-            $this->logger->error('Error during group patch ' . $e->getMessage(), $payload);
+            $this->logger->error('Error during user patch ' . $e->getMessage(), $payload);
             return new JsonResponse(
                 [
                     'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
@@ -207,13 +220,17 @@ class GroupController extends AbstractResourceController
      *
      * @param string $resourceId
      * @param ServerRequestInterface $request
+     * @param Context $context
      * @return ResponseInterface
      */
-    public function updateAction(string $resourceId, ServerRequestInterface $request): ResponseInterface
-    {
+    public function updateAction(
+        string $resourceId,
+        ServerRequestInterface $request,
+        Context $context
+    ): ResponseInterface {
         $payload = json_decode($request->getBody()->getContents(), true);
         if (!$payload) {
-            $this->logger->error('Error during group update ' . $resourceId, $payload);
+            $this->logger->error('Error during user update ' . $resourceId, $payload);
             return new JsonResponse(
                 [
                     'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
@@ -225,16 +242,17 @@ class GroupController extends AbstractResourceController
         }
 
         try {
-            $this->logger->info('Update group ' . $resourceId, $payload);
+            $this->logger->info('Update user ' . $resourceId, $payload);
             return new JsonResponse(
-                $this->groupService->update(
+                $this->userService->update(
                     $resourceId,
                     $payload,
-                    $this->getConfiguration($request)
+                    $this->getConfiguration($request),
+                    $context
                 )
             );
         } catch (NoResourceFoundException $e) {
-            $this->logger->warning('No group found ' . $resourceId, $payload);
+            $this->logger->warning('No user found ' . $resourceId, $payload);
             return new JsonResponse(
                 [
                     'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
@@ -244,7 +262,7 @@ class GroupController extends AbstractResourceController
                 404
             );
         } catch (\Exception $e) {
-            $this->logger->error('Error during group update ' . $e->getMessage(), $payload);
+            $this->logger->error('Error during user update ' . $e->getMessage(), $payload);
             return new JsonResponse(
                 [
                     'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
@@ -261,16 +279,20 @@ class GroupController extends AbstractResourceController
      *
      * @param string $resourceId
      * @param ServerRequestInterface $request
+     * @param Context $context
      * @return ResponseInterface
      */
-    public function deleteAction(string $resourceId, ServerRequestInterface $request): ResponseInterface
-    {
+    public function deleteAction(
+        string $resourceId,
+        ServerRequestInterface $request,
+        Context $context
+    ): ResponseInterface {
         try {
-            $this->logger->info('Delete group ' . $resourceId);
-            $this->groupService->delete($resourceId);
+            $this->logger->info('Delete user ' . $resourceId);
+            $this->userService->delete($resourceId, $this->getConfiguration($request), $context);
             return new HtmlResponse('', 204);
         } catch (\Exception $e) {
-            $this->logger->error('Error during group delete ' . $e->getMessage());
+            $this->logger->error('Error during user delete ' . $e->getMessage());
             return new JsonResponse(
                 [
                     'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],

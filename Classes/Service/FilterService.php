@@ -30,9 +30,10 @@ class FilterService
      * @param string $filter
      * @param QueryBuilder $qb
      * @param array $mapping
-     * @return array|false
+     * @param array $meta
+     * @return array
      */
-    public function convertFilter(string $filter, QueryBuilder $qb, array $mapping): array|false
+    public function convertFilter(string $filter, QueryBuilder $qb, array $mapping, array $meta): array
     {
         $constraints = [];
 
@@ -43,9 +44,9 @@ class FilterService
             throw new BadRequestException('Bad request : ' . $e->getMessage());
         }
 
-        $constraints[] = $this->convertNode($node, $qb, $mapping);
+        $constraints[] = $this->convertNode($node, $qb, $mapping, $meta);
 
-        return empty($constraints) ? false : $constraints;
+        return $constraints;
     }
 
     /**
@@ -54,14 +55,15 @@ class FilterService
      * @param Node $node
      * @param QueryBuilder $qb
      * @param array $mapping
-     * @return CompositeExpression|string
+     * @param array $meta
+     * @return CompositeExpression
      */
-    private function convertNode(Node $node, QueryBuilder $qb, array $mapping): CompositeExpression|string
+    private function convertNode(Node $node, QueryBuilder $qb, array $mapping, array $meta): CompositeExpression
     {
         return match (get_class($node)) {
-            ComparisonExpression::class => $this->comparaison($node, $qb, $mapping),
-            Disjunction::class => $this->disjunction($node, $qb, $mapping),
-            Conjunction::class => $this->conjunction($node, $qb, $mapping)
+            ComparisonExpression::class => $this->comparaison($node, $qb, $mapping, $meta),
+            Disjunction::class => $this->disjunction($node, $qb, $mapping, $meta),
+            Conjunction::class => $this->conjunction($node, $qb, $mapping, $meta),
         };
     }
 
@@ -71,23 +73,46 @@ class FilterService
      * @param ComparisonExpression $node
      * @param QueryBuilder $qb
      * @param array $mapping
-     * @return string
+     * @param array $meta
+     * @return CompositeExpression
      */
-    private function comparaison(ComparisonExpression $node, QueryBuilder $qb, array $mapping): string
-    {
-        $field = $this->mappingService->findField((string)$node->attributePath, $mapping);
-        return match ($node->operator) {
-            'eq' => $qb->expr()->eq($field, $qb->createNamedParameter($node->compareValue)),
-            'ne' => $qb->expr()->neq($field, $qb->createNamedParameter($node->compareValue)),
-            'co' => $qb->expr()->like($field, $qb->createNamedParameter('%' . $node->compareValue . '%')),
-            'sw' => $qb->expr()->like($field, $qb->createNamedParameter($node->compareValue . '%')),
-            'ew' => $qb->expr()->like($field, $qb->createNamedParameter('%' . $node->compareValue)),
-            'pr' => $qb->expr()->notLike($field, $qb->createNamedParameter('')),
-            'gt' => $qb->expr()->gt($field, $qb->createNamedParameter($node->compareValue)),
-            'ge' => $qb->expr()->gte($field, $qb->createNamedParameter($node->compareValue)),
-            'lt' => $qb->expr()->lt($field, $qb->createNamedParameter($node->compareValue)),
-            'le' => $qb->expr()->lte($field, $qb->createNamedParameter($node->compareValue))
+    private function comparaison(
+        ComparisonExpression $node,
+        QueryBuilder $qb,
+        array $mapping,
+        array $meta
+    ): CompositeExpression {
+        $fields = ['scim_id'];
+        if ((string)$node->attributePath !== 'id') {
+            $fields = $this->mappingService->findFieldsCorrespondingProperty(
+                (string)$node->attributePath,
+                $mapping,
+                $meta
+            );
+        }
+
+        if (!$fields) {
+            throw new BadRequestException('Filter not valid');
+        }
+
+        $v = $node->compareValue;
+        if (preg_match('/[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}.*/', $v)) {
+            $v = (new \DateTime($v))->getTimestamp();
+        }
+
+        $comparisons = match ($node->operator) {
+            'eq' => array_map(fn ($f) => $qb->expr()->eq($f, $qb->createNamedParameter($v)), $fields),
+            'ne' => array_map(fn ($f) => $qb->expr()->neq($f, $qb->createNamedParameter($v)), $fields),
+            'co' => array_map(fn ($f) => $qb->expr()->like($f, $qb->createNamedParameter('%' . $v . '%')), $fields),
+            'sw' => array_map(fn ($f) => $qb->expr()->like($f, $qb->createNamedParameter($v . '%')), $fields),
+            'ew' => array_map(fn ($f) => $qb->expr()->like($f, $qb->createNamedParameter('%' . $v)), $fields),
+            'pr' => array_map(fn ($f) => $qb->expr()->notLike($f, $qb->createNamedParameter('')), $fields),
+            'gt' => array_map(fn ($f) => $qb->expr()->gt($f, $qb->createNamedParameter($v)), $fields),
+            'ge' => array_map(fn ($f) => $qb->expr()->gte($f, $qb->createNamedParameter($v)), $fields),
+            'lt' => array_map(fn ($f) => $qb->expr()->lt($f, $qb->createNamedParameter($v)), $fields),
+            'le' => array_map(fn ($f) => $qb->expr()->lte($f, $qb->createNamedParameter($v)), $fields),
         };
+        return $qb->expr()->or(...$comparisons);
     }
 
     /**
@@ -96,11 +121,17 @@ class FilterService
      * @param Disjunction $node
      * @param QueryBuilder $qb
      * @param array $mapping
+     * @param array $meta
      * @return CompositeExpression
      */
-    private function disjunction(Disjunction $node, QueryBuilder $qb, array $mapping): CompositeExpression
+    private function disjunction(Disjunction $node, QueryBuilder $qb, array $mapping, array $meta): CompositeExpression
     {
-        return $qb->expr()->or(...array_map(fn ($t) => $this->convertNode($t, $qb, $mapping), $node->getTerms()));
+        return $qb->expr()->or(
+            ...array_map(
+                fn ($t) => $this->convertNode($t, $qb, $mapping, $meta),
+                $node->getTerms()
+            )
+        );
     }
 
     /**
@@ -109,10 +140,16 @@ class FilterService
      * @param Conjunction $node
      * @param QueryBuilder $qb
      * @param array $mapping
+     * @param array $meta
      * @return CompositeExpression
      */
-    private function conjunction(Conjunction $node, QueryBuilder $qb, array $mapping): CompositeExpression
+    private function conjunction(Conjunction $node, QueryBuilder $qb, array $mapping, array $meta): CompositeExpression
     {
-        return $qb->expr()->and(...array_map(fn ($f) => $this->convertNode($f, $qb, $mapping), $node->getFactors()));
+        return $qb->expr()->and(
+            ...array_map(
+                fn ($f) => $this->convertNode($f, $qb, $mapping, $meta),
+                $node->getFactors()
+            )
+        );
     }
 }

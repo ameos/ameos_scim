@@ -1,6 +1,16 @@
-mapping:
-  frontend.group:
-    displayName:
-      mapOn: title
-    members:
-      callback: Ameos\Scim\Evaluator\MemberEvaluator
+scim:
+  frontend:
+    group:
+      meta:
+        created:
+          mapOn: crdate
+        lastModified:
+          mapOn: tstamp
+      mapping:
+        displayName:
+          mapOn: title
+        members:
+          object: Ameos\Scim\CustomObject\MemberObject
+          arguments:
+            field_user: usergroup
+            field_group: subgroup

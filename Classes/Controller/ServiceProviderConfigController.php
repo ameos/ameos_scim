@@ -29,7 +29,7 @@ class ServiceProviderConfigController
                     'supported' => true
                 ],
                 'bulk' => [
-                    'supported' => false,
+                    'supported' => true,
                 ],
                 'filter' => [
                     'supported' => true,
