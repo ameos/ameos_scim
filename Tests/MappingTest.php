@@ -149,6 +149,6 @@ final class MappingTest extends UnitTestCase
     {
         $mappingService = new MappingService();
 
-        self::assertEquals($expectedResult, $mappingService->findFieldsCorrespondingProperty($property, $mapping));
+        self::assertEquals($expectedResult, $mappingService->findFieldsCorrespondingProperty($property, $mapping, []));
     }
 }
