@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Ameos\Scim\Test;
+namespace Ameos\Scim\Test\Mapping;
 
 use Ameos\Scim\CustomObject\MultiValuedObject;
 use Ameos\Scim\Service\MappingService;
@@ -10,7 +10,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use TYPO3\TestingFramework\Core\Unit\UnitTestCase;
 
-final class MappingTest extends UnitTestCase
+final class FindFieldsTest extends UnitTestCase
 {
     /**
      * Data provider for findField

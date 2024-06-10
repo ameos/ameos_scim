@@ -86,6 +86,7 @@ class MappingService
      */
     public function payloadToData(array $payload, array $mapping): array
     {
+        $payload = array_change_key_case($payload);
         $data = [];
         foreach ($mapping as $key => $configuration) {
             $key = mb_strtolower($key);
