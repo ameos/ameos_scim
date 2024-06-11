@@ -9,6 +9,7 @@ use Ameos\Scim\Controller\BulkController;
 use Ameos\Scim\Controller\GroupController;
 use Ameos\Scim\Controller\UserController;
 use Ameos\Scim\Controller\ResourceTypeController;
+use Ameos\Scim\Controller\SchemaController;
 use Ameos\Scim\Controller\ServiceProviderConfigController;
 use Ameos\Scim\Enum\Context;
 use Ameos\Scim\Exception\RoutingFailedException;
@@ -96,6 +97,13 @@ class RoutingService
         }
 
         if (
+            preg_match('/^' . $path . 'Bulk\/?$/i', $request->getUri()->getPath())
+            && $request->getMethod() === self::HTTP_POST
+        ) {
+            $response = GeneralUtility::makeInstance(BulkController::class)->bulkAction($request, $context);
+        }
+
+        if (
             preg_match('/^' . $path . 'ResourceTypes\/?$/i', $request->getUri()->getPath())
             && $request->getMethod() === self::HTTP_GET
         ) {
@@ -103,10 +111,10 @@ class RoutingService
         }
 
         if (
-            preg_match('/^' . $path . 'Bulk\/?$/i', $request->getUri()->getPath())
-            && $request->getMethod() === self::HTTP_POST
+            preg_match('/^' . $path . 'Schemas\/?$/i', $request->getUri()->getPath())
+            && $request->getMethod() === self::HTTP_GET
         ) {
-            $response = GeneralUtility::makeInstance(BulkController::class)->bulkAction($request, $context);
+            $response = GeneralUtility::makeInstance(SchemaController::class)->schemaAction($request, $context);
         }
 
         if (
