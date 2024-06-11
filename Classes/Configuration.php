@@ -42,7 +42,9 @@ class Configuration
             isset($GLOBALS['TYPO3_CONF_VARS']['SCIM']['Configuration']['Custom'])
             && !empty($GLOBALS['TYPO3_CONF_VARS']['SCIM']['Configuration']['Custom'])
         ) {
-            $filepath = GeneralUtility::getFileAbsFileName($GLOBALS['TYPO3_CONF_VARS']['SCIM']['Configuration']['Custom']);
+            $filepath = GeneralUtility::getFileAbsFileName(
+                $GLOBALS['TYPO3_CONF_VARS']['SCIM']['Configuration']['Custom']
+            );
             if (!empty($filepath) && file_exists($filepath)) {
                 return $GLOBALS['TYPO3_CONF_VARS']['SCIM']['Configuration']['Custom'];
             }
