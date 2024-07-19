@@ -5,9 +5,7 @@ namespace Ameos\Scim\Controller\Traits;
 use Ameos\Scim\Configuration;
 use Ameos\Scim\Enum\Context;
 use Psr\Http\Message\ServerRequestInterface;
-use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
 use TYPO3\CMS\Core\Configuration\Loader\YamlFileLoader;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 trait ConfigurationAccess
 {

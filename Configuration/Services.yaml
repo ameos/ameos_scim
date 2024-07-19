@@ -42,3 +42,9 @@ services:
     tags:
       - name: event.listener
         identifier: 'scim/clean-groups'
+
+  Ameos\Scim\ConfigurationModuleProvider\ScimConfigurationProvider:       
+    tags:
+      - name: 'lowlevel.configuration.module.provider'
+        identifier: 'scimConfigurationProvider'
+        label: 'LLL:EXT:scim/Resources/Private/Language/locallang.xlf:scimConfigurationProvider'

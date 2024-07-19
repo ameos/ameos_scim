@@ -12,6 +12,9 @@
             <trans-unit id="scim_id">
                 <source>Scim ID</source>
             </trans-unit>
+            <trans-unit id="scimConfigurationProvider">
+                <source>Configuration mapping SCIM</source>
+            </trans-unit>            
         </body>
     </file>
 </xliff>
