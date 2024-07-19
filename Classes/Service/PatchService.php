@@ -38,6 +38,7 @@ class PatchService
         $payload = array_change_key_case($payload);
         foreach ($payload['operations'] as $operation) {
             $operation = array_change_key_case($operation);
+            $operation['op'] = mb_strtolower($operation['op']);
             $record = match ($operation['op']) {
                 self::OP_ADD => $this->add($record, $operation, $mapping, $meta),
                 self::OP_REMOVE => $this->remove($record, $operation, $mapping, $meta),

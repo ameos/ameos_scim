@@ -36,12 +36,14 @@ class ScimRequirementMiddleware implements MiddlewareInterface
             (bool)$config['be_activation'] === true
             && preg_match('/^' . str_replace('/', '\/', $config['be_path']) . '.*/', $request->getUri()->getPath())
         ) {
+            $GLOBALS['TYPO3_CONF_VARS']['FE']['pageNotFoundOnCHashError'] = false;
             $request = $this->enrichingRequest($request, Context::Backend);
         }
         if (
             (bool)$config['fe_activation'] === true
             && preg_match('/^' . str_replace('/', '\/', $config['fe_path']) . '.*/', $request->getUri()->getPath())
         ) {
+            $GLOBALS['TYPO3_CONF_VARS']['FE']['pageNotFoundOnCHashError'] = false;
             $request = $this->enrichingRequest($request, Context::Frontend);
         }
 

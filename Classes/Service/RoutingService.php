@@ -130,6 +130,10 @@ class RoutingService
             throw new RoutingFailedException('Scim routing failed. Http request not valid');
         }
 
+        $response = $response
+            ->withHeader('Pragma', 'no-cache')
+            ->withHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
+
         return $response;
     }
 

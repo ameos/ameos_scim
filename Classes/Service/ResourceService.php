@@ -57,10 +57,6 @@ class ResourceService
             (int)$configuration['pid']
         );
 
-        if ($totalResults === 0) {
-            throw new NoResourceFoundException($resourceType->value . ' not found');
-        }
-
         $payload = [
             'schemas' => ['urn:ietf:params:scim:api:messages:2.0:ListResponse'],
             'totalResults' => $totalResults,
