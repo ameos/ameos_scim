@@ -18,7 +18,7 @@ CREATE TABLE be_groups (
     scim_id varchar(255) DEFAULT '' NOT NULL,
 );
 
-CREATE TABLE tx_scim_access (
+CREATE TABLE tx_ameosscim_access (
     uid int(11) NOT NULL auto_increment,
     pid int(11) DEFAULT '0' NOT NULL,
     createdon int(11) DEFAULT '0' NOT NULL,

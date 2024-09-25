@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Ameos\Scim\Event;
+namespace Ameos\AmeosScim\Event;
 
-use Ameos\Scim\Enum\Context;
+use Ameos\AmeosScim\Enum\Context;
 
 final class PostDeleteUserEvent
 {

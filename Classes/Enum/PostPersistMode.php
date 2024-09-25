@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Ameos\Scim\Enum;
+namespace Ameos\AmeosScim\Enum;
 
 enum PostPersistMode
 {

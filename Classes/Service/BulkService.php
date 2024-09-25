@@ -2,23 +2,23 @@
 
 declare(strict_types=1);
 
-namespace Ameos\Scim\Service;
+namespace Ameos\AmeosScim\Service;
 
-use Ameos\Scim\Domain\Repository\AbstractResourceRepository;
-use Ameos\Scim\Domain\Repository\BackendGroupRepository;
-use Ameos\Scim\Domain\Repository\BackendUserRepository;
-use Ameos\Scim\Domain\Repository\FrontendGroupRepository;
-use Ameos\Scim\Domain\Repository\FrontendUserRepository;
-use Ameos\Scim\Enum\Context;
-use Ameos\Scim\Enum\PostPersistMode;
-use Ameos\Scim\Enum\ResourceType;
-use Ameos\Scim\Event\PostDeleteGroupEvent;
-use Ameos\Scim\Event\PostDeleteUserEvent;
-use Ameos\Scim\Event\PostPersistGroupEvent;
-use Ameos\Scim\Event\PostPersistUserEvent;
-use Ameos\Scim\Exception\BadRequestException;
-use Ameos\Scim\Exception\NoResourceFoundException;
-use Ameos\Scim\Registry\BulkIdRegistry;
+use Ameos\AmeosScim\Domain\Repository\AbstractResourceRepository;
+use Ameos\AmeosScim\Domain\Repository\BackendGroupRepository;
+use Ameos\AmeosScim\Domain\Repository\BackendUserRepository;
+use Ameos\AmeosScim\Domain\Repository\FrontendGroupRepository;
+use Ameos\AmeosScim\Domain\Repository\FrontendUserRepository;
+use Ameos\AmeosScim\Enum\Context;
+use Ameos\AmeosScim\Enum\PostPersistMode;
+use Ameos\AmeosScim\Enum\ResourceType;
+use Ameos\AmeosScim\Event\PostDeleteGroupEvent;
+use Ameos\AmeosScim\Event\PostDeleteUserEvent;
+use Ameos\AmeosScim\Event\PostPersistGroupEvent;
+use Ameos\AmeosScim\Event\PostPersistUserEvent;
+use Ameos\AmeosScim\Exception\BadRequestException;
+use Ameos\AmeosScim\Exception\NoResourceFoundException;
+use Ameos\AmeosScim\Registry\BulkIdRegistry;
 use LogicException;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
@@ -345,7 +345,7 @@ class BulkService
         $normalizedParams = $GLOBALS['TYPO3_REQUEST']->getAttribute('normalizedParams');
 
         $pathConf = $context === Context::Frontend ? 'fe_path' : 'be_path';
-        $apiPath = $this->extensionConfiguration->get('scim', $pathConf) . $resourceType->value . '/';
+        $apiPath = $this->extensionConfiguration->get('ameos_scim', $pathConf) . $resourceType->value . '/';
 
         return trim($normalizedParams->getSiteUrl(), '/') . $apiPath . $resourceId;
     }

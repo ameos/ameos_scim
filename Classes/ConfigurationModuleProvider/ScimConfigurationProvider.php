@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Ameos\Scim\ConfigurationModuleProvider;
+namespace Ameos\AmeosScim\ConfigurationModuleProvider;
 
-use Ameos\Scim\Configuration;
+use Ameos\AmeosScim\Configuration;
 use TYPO3\CMS\Core\Configuration\Loader\YamlFileLoader;
 use TYPO3\CMS\Lowlevel\ConfigurationModuleProvider\AbstractProvider;
 

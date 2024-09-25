@@ -2,17 +2,17 @@
 
 declare(strict_types=1);
 
-namespace Ameos\Scim\EventListener;
+namespace Ameos\AmeosScim\EventListener;
 
-use Ameos\Scim\CustomObject\MemberObject;
-use Ameos\Scim\Domain\Repository\AbstractResourceRepository;
-use Ameos\Scim\Domain\Repository\BackendUserRepository;
-use Ameos\Scim\Domain\Repository\FrontendUserRepository;
-use Ameos\Scim\Enum\Context;
-use Ameos\Scim\Enum\PostPersistMode;
-use Ameos\Scim\Event\PostPersistGroupEvent;
-use Ameos\Scim\Registry\BulkIdRegistry;
-use Ameos\Scim\Service\PatchService;
+use Ameos\AmeosScim\CustomObject\MemberObject;
+use Ameos\AmeosScim\Domain\Repository\AbstractResourceRepository;
+use Ameos\AmeosScim\Domain\Repository\BackendUserRepository;
+use Ameos\AmeosScim\Domain\Repository\FrontendUserRepository;
+use Ameos\AmeosScim\Enum\Context;
+use Ameos\AmeosScim\Enum\PostPersistMode;
+use Ameos\AmeosScim\Event\PostPersistGroupEvent;
+use Ameos\AmeosScim\Registry\BulkIdRegistry;
+use Ameos\AmeosScim\Service\PatchService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 final class ProcessMembersAfterGroupPersist

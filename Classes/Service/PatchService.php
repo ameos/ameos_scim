@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Ameos\Scim\Service;
+namespace Ameos\AmeosScim\Service;
 
-use Ameos\Scim\Exception\PatchTestErrorException;
+use Ameos\AmeosScim\Exception\PatchTestErrorException;
 
 class PatchService
 {

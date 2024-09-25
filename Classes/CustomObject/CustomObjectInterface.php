@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Ameos\Scim\CustomObject;
+namespace Ameos\AmeosScim\CustomObject;
 
-use Ameos\Scim\Enum\Context;
+use Ameos\AmeosScim\Enum\Context;
 
 interface CustomObjectInterface
 {

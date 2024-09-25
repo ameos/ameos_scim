@@ -48,7 +48,7 @@ Select your root page and click Edit the whole template record.
 
 Add the static template SCIM Configuration.
 
-Edit the plugin.tx_scim.pid constant with the ID of the storage folder containing frontend users.
+Edit the plugin.tx_ameosscim.pid constant with the ID of the storage folder containing frontend users.
 
 ### Extension Settings
 

@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Ameos\Scim\Domain\Repository;
+namespace Ameos\AmeosScim\Domain\Repository;
 
-use Ameos\Scim\Service\FilterService;
-use Ameos\Scim\Service\MappingService;
+use Ameos\AmeosScim\Service\FilterService;
+use Ameos\AmeosScim\Service\MappingService;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Result;
 use Symfony\Component\Uid\UuidV6;

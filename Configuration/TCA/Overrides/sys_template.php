@@ -6,4 +6,4 @@ defined('TYPO3') or die('Access denied');
 
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 
-ExtensionManagementUtility::addStaticFile('scim', 'Configuration/TypoScript', 'Scim configuration');
+ExtensionManagementUtility::addStaticFile('ameos_scim', 'Configuration/TypoScript', 'Scim configuration');

@@ -1,9 +1,9 @@
 <?php
 
-namespace Ameos\Scim\Controller\Traits;
+namespace Ameos\AmeosScim\Controller\Traits;
 
-use Ameos\Scim\Configuration;
-use Ameos\Scim\Enum\Context;
+use Ameos\AmeosScim\Configuration;
+use Ameos\AmeosScim\Enum\Context;
 use Psr\Http\Message\ServerRequestInterface;
 use TYPO3\CMS\Core\Configuration\Loader\YamlFileLoader;
 
@@ -24,7 +24,7 @@ trait ConfigurationAccess
 
         if ($request->getAttribute('scim_context') === Context::Frontend) {
             $typoscript = $request->getAttribute('frontend.typoscript')
-                ->getSetupArray()['plugin.']['tx_scim.']['settings.'] ?? [];
+                ->getSetupArray()['plugin.']['tx_ameosscim.']['settings.'] ?? [];
         }
 
         $configuration['pid'] = isset($typoscript['pid']) ? (int)$typoscript['pid'] : 0;

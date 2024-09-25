@@ -2,7 +2,7 @@
 
 return [
     'ctrl' => [
-        'title' => 'LLL:EXT:scim/Resources/Private/Language/locallang_db.xlf:scim_access',
+        'title' => 'LLL:EXT:ameos_scim/Resources/Private/Language/locallang_db.xlf:scim_access',
         'label' => 'name',
         'crdate' => 'createdon',
         'tstamp' => 'updatedon',
@@ -16,7 +16,7 @@ return [
         ],
         'searchFields' => 'name',
         'versioningWS_alwaysAllowLiveEdit' => true,
-        'iconfile' => 'EXT:scim/Resources/Public/Icons/Extension.svg',
+        'iconfile' => 'EXT:ameos_scim/Resources/Public/Icons/Extension.svg',
     ],
     'types' => [
         '1' => [
@@ -26,7 +26,7 @@ return [
     'palettes' => [],
     'columns' => [
         'name' => [
-            'label' => 'LLL:EXT:scim/Resources/Private/Language/locallang_db.xlf:scim_access.name',
+            'label' => 'LLL:EXT:ameos_scim/Resources/Private/Language/locallang_db.xlf:scim_access.name',
             'config' => [
                 'type' => 'input',
                 'required' => true,
@@ -34,7 +34,7 @@ return [
             ],
         ],
         'secret' => [
-            'label' => 'LLL:EXT:scim/Resources/Private/Language/locallang_db.xlf:scim_access.secret',
+            'label' => 'LLL:EXT:ameos_scim/Resources/Private/Language/locallang_db.xlf:scim_access.secret',
             'config' => [
                 'type' => 'password',
                 'required' => true,

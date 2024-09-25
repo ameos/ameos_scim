@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace Ameos\Scim\EventListener;
+namespace Ameos\AmeosScim\EventListener;
 
-use Ameos\Scim\CustomObject\MemberObject;
-use Ameos\Scim\Domain\Repository\BackendGroupRepository;
-use Ameos\Scim\Domain\Repository\BackendUserRepository;
-use Ameos\Scim\Domain\Repository\FrontendGroupRepository;
-use Ameos\Scim\Domain\Repository\FrontendUserRepository;
-use Ameos\Scim\Enum\Context;
-use Ameos\Scim\Event\PostDeleteGroupEvent;
+use Ameos\AmeosScim\CustomObject\MemberObject;
+use Ameos\AmeosScim\Domain\Repository\BackendGroupRepository;
+use Ameos\AmeosScim\Domain\Repository\BackendUserRepository;
+use Ameos\AmeosScim\Domain\Repository\FrontendGroupRepository;
+use Ameos\AmeosScim\Domain\Repository\FrontendUserRepository;
+use Ameos\AmeosScim\Enum\Context;
+use Ameos\AmeosScim\Event\PostDeleteGroupEvent;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 final class CleanUsersAfterGroupRemoved

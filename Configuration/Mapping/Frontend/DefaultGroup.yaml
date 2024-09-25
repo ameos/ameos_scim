@@ -10,7 +10,7 @@ scim:
         displayName:
           mapOn: title
         members:
-          object: Ameos\Scim\CustomObject\MemberObject
+          object: Ameos\AmeosScim\CustomObject\MemberObject
           arguments:
             field_user: usergroup
             field_group: subgroup

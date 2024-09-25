@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Ameos\Scim\Service;
+namespace Ameos\AmeosScim\Service;
 
-use Ameos\Scim\CustomObject\GroupObject;
-use Ameos\Scim\CustomObject\MemberObject;
-use Ameos\Scim\CustomObject\MultiValuedObject;
-use Ameos\Scim\Enum\Context;
-use Ameos\Scim\Enum\ResourceType;
-use Ameos\Scim\Event\ConvertMappingToSchemaEvent;
+use Ameos\AmeosScim\CustomObject\GroupObject;
+use Ameos\AmeosScim\CustomObject\MemberObject;
+use Ameos\AmeosScim\CustomObject\MultiValuedObject;
+use Ameos\AmeosScim\Enum\Context;
+use Ameos\AmeosScim\Enum\ResourceType;
+use Ameos\AmeosScim\Event\ConvertMappingToSchemaEvent;
 use Psr\EventDispatcher\EventDispatcherInterface;
 
 class SchemaService

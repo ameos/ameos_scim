@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Ameos\Scim\Event;
+namespace Ameos\AmeosScim\Event;
 
-use Ameos\Scim\Enum\Context;
-use Ameos\Scim\Enum\PostPersistMode;
+use Ameos\AmeosScim\Enum\Context;
+use Ameos\AmeosScim\Enum\PostPersistMode;
 
 final class PostPersistUserEvent
 {

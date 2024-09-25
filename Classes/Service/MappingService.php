@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Ameos\Scim\Service;
+namespace Ameos\AmeosScim\Service;
 
-use Ameos\Scim\CustomObject\CustomObjectInterface;
-use Ameos\Scim\Enum\Context;
+use Ameos\AmeosScim\CustomObject\CustomObjectInterface;
+use Ameos\AmeosScim\Enum\Context;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class MappingService

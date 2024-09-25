@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Ameos\Scim\CustomObject;
+namespace Ameos\AmeosScim\CustomObject;
 
-use Ameos\Scim\Enum\Context;
+use Ameos\AmeosScim\Enum\Context;
 use Doctrine\DBAL\ArrayParameterType;
 use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
 use TYPO3\CMS\Core\Database\Connection;
@@ -36,7 +36,7 @@ class MemberObject implements CustomObjectInterface
         /** @var NormalizedParams */
         $normalizedParams = $GLOBALS['TYPO3_REQUEST']->getAttribute('normalizedParams');
         $confPath = $context === Context::Frontend ? 'fe_path' : 'be_path';
-        $apiPath = $this->extensionConfiguration->get('scim', $confPath);
+        $apiPath = $this->extensionConfiguration->get('ameos_scim', $confPath);
 
         $members = [];
 

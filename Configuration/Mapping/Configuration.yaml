@@ -1,5 +1,5 @@
 imports:
-  - { resource: "EXT:scim/Configuration/Mapping/Frontend/DefaultUser.yaml" }
-  - { resource: "EXT:scim/Configuration/Mapping/Frontend/DefaultGroup.yaml" }
-  - { resource: "EXT:scim/Configuration/Mapping/Backend/DefaultUser.yaml" }
-  - { resource: "EXT:scim/Configuration/Mapping/Backend/DefaultGroup.yaml" }
+  - { resource: "EXT:ameos_scim/Configuration/Mapping/Frontend/DefaultUser.yaml" }
+  - { resource: "EXT:ameos_scim/Configuration/Mapping/Frontend/DefaultGroup.yaml" }
+  - { resource: "EXT:ameos_scim/Configuration/Mapping/Backend/DefaultUser.yaml" }
+  - { resource: "EXT:ameos_scim/Configuration/Mapping/Backend/DefaultGroup.yaml" }

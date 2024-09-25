@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Ameos\Scim\Controller;
+namespace Ameos\AmeosScim\Controller;
 
-use Ameos\Scim\Enum\Context;
-use Ameos\Scim\Enum\ResourceType;
-use Ameos\Scim\Service\SchemaService;
+use Ameos\AmeosScim\Enum\Context;
+use Ameos\AmeosScim\Enum\ResourceType;
+use Ameos\AmeosScim\Service\SchemaService;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
@@ -36,7 +36,7 @@ class SchemaController
         $normalizedParams = $request->getAttribute('normalizedParams');
         $pathConf = $context === Context::Frontend ? 'fe_path' : 'be_path';
         $url = trim($normalizedParams->getSiteUrl(), '/') .
-            $this->extensionConfiguration->get('scim', $pathConf)
+            $this->extensionConfiguration->get('ameos_scim', $pathConf)
             . 'Schemas/';
 
         $configuration = $this->getConfiguration($request);

@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Ameos\Scim\Service;
+namespace Ameos\AmeosScim\Service;
 
-use Ameos\Scim\Domain\Repository\AbstractResourceRepository;
-use Ameos\Scim\Enum\Context;
-use Ameos\Scim\Enum\ResourceType;
-use Ameos\Scim\Exception\NoResourceFoundException;
-use Ameos\Scim\Service\MappingService;
-use Ameos\Scim\Service\PatchService;
+use Ameos\AmeosScim\Domain\Repository\AbstractResourceRepository;
+use Ameos\AmeosScim\Enum\Context;
+use Ameos\AmeosScim\Enum\ResourceType;
+use Ameos\AmeosScim\Exception\NoResourceFoundException;
+use Ameos\AmeosScim\Service\MappingService;
+use Ameos\AmeosScim\Service\PatchService;
 use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
 use TYPO3\CMS\Core\Http\NormalizedParams;
 
@@ -223,7 +223,7 @@ class ResourceService
         );
 
         $pathConf = $context === Context::Frontend ? 'fe_path' : 'be_path';
-        $apiPath = $this->extensionConfiguration->get('scim', $pathConf) . $resourceType->value . '/';
+        $apiPath = $this->extensionConfiguration->get('ameos_scim', $pathConf) . $resourceType->value . '/';
 
         $createdField = $configuration['meta']['created']['mapOn'] ?? 'crdate';
         $lastModifiedField = $configuration['meta']['lastModified']['mapOn'] ?? 'tstamp';

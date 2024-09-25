@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Ameos\Scim\Controller;
+namespace Ameos\AmeosScim\Controller;
 
-use Ameos\Scim\Enum\Context;
-use Ameos\Scim\Service\BulkService;
+use Ameos\AmeosScim\Enum\Context;
+use Ameos\AmeosScim\Service\BulkService;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
