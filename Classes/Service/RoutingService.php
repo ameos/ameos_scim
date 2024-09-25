@@ -2,17 +2,17 @@
 
 declare(strict_types=1);
 
-namespace Ameos\Scim\Service;
+namespace Ameos\AmeosScim\Service;
 
-use Ameos\Scim\Controller\AbstractResourceController;
-use Ameos\Scim\Controller\BulkController;
-use Ameos\Scim\Controller\GroupController;
-use Ameos\Scim\Controller\UserController;
-use Ameos\Scim\Controller\ResourceTypeController;
-use Ameos\Scim\Controller\SchemaController;
-use Ameos\Scim\Controller\ServiceProviderConfigController;
-use Ameos\Scim\Enum\Context;
-use Ameos\Scim\Exception\RoutingFailedException;
+use Ameos\AmeosScim\Controller\AbstractResourceController;
+use Ameos\AmeosScim\Controller\BulkController;
+use Ameos\AmeosScim\Controller\GroupController;
+use Ameos\AmeosScim\Controller\UserController;
+use Ameos\AmeosScim\Controller\ResourceTypeController;
+use Ameos\AmeosScim\Controller\SchemaController;
+use Ameos\AmeosScim\Controller\ServiceProviderConfigController;
+use Ameos\AmeosScim\Enum\Context;
+use Ameos\AmeosScim\Exception\RoutingFailedException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
@@ -41,7 +41,7 @@ class RoutingService
      */
     public function route(ServerRequestInterface $request): ResponseInterface
     {
-        $config = $this->extensionConfiguration->get('scim');
+        $config = $this->extensionConfiguration->get('ameos_scim');
         $context = $request->getAttribute('scim_context');
 
         $path = str_replace(

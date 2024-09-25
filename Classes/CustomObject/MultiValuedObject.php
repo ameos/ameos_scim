@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Ameos\Scim\CustomObject;
+namespace Ameos\AmeosScim\CustomObject;
 
-use Ameos\Scim\Enum\Context;
-use Ameos\Scim\Exception\BadRequestException;
-use Ameos\Scim\Exception\NotImplementedException;
+use Ameos\AmeosScim\Enum\Context;
+use Ameos\AmeosScim\Exception\BadRequestException;
+use Ameos\AmeosScim\Exception\NotImplementedException;
 use Tmilos\Lexer\Error\UnknownTokenException;
 use Tmilos\ScimFilterParser\Ast\ComparisonExpression;
 use Tmilos\ScimFilterParser\Ast\Conjunction;

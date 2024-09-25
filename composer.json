@@ -1,5 +1,5 @@
 {
-    "name": "ameos/scim",
+    "name": "ameos/ameos_scim",
     "description": "SCIM Extension for TYPO3",
     "type": "typo3-cms-extension",
     "require": {
@@ -23,13 +23,13 @@
     ],
     "extra": {
         "typo3/cms": {
-            "extension-key": "scim"
+            "extension-key": "ameos_scim"
         }
     },
     "autoload": {
         "psr-4": {
-            "Ameos\\Scim\\": "Classes",
-            "Ameos\\Scim\\Tests\\": "Tests"
+            "Ameos\\AmeosScim\\": "Classes",
+            "Ameos\\AmeosScim\\Tests\\": "Tests"
         }
     }
 }

@@ -1,5 +1,5 @@
-plugin.tx_scim {
+plugin.tx_ameosscim {
     settings {
-        pid = {$plugin.tx_scim.pid}
+        pid = {$plugin.tx_ameosscim.pid}
     }
 }

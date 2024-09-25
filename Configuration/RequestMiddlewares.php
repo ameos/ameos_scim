@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use Ameos\Scim\Middleware\ScimRequirementMiddleware;
-use Ameos\Scim\Middleware\ScimRoutingMiddleware;
+use Ameos\AmeosScim\Middleware\ScimRequirementMiddleware;
+use Ameos\AmeosScim\Middleware\ScimRoutingMiddleware;
 
 return [
     'frontend' => [

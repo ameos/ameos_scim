@@ -1,6 +1,6 @@
 <?php
 
-$EM_CONF['scim'] = [
+$EM_CONF['ameos_scim'] = [
     'title' => 'SCIM Extension for TYPO3',
     'description' => 'SCIM Extension for TYPO3',
     'author' => 'AMEOS Team',

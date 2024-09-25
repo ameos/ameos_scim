@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Ameos\Scim\Controller;
+namespace Ameos\AmeosScim\Controller;
 
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;

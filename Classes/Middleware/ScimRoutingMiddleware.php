@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Ameos\Scim\Middleware;
+namespace Ameos\AmeosScim\Middleware;
 
-use Ameos\Scim\Service\RoutingService;
+use Ameos\AmeosScim\Service\RoutingService;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
@@ -69,8 +69,8 @@ class ScimRoutingMiddleware implements MiddlewareInterface
     {
         $hashInstance = GeneralUtility::makeInstance(PasswordHashFactory::class)->getDefaultHashInstance('BE');
 
-        $qb = $this->connectionPool->getQueryBuilderForTable('tx_scim_access');
-        $result = $qb->select('*')->from('tx_scim_access')->executeQuery();
+        $qb = $this->connectionPool->getQueryBuilderForTable('tx_ameosscim_access');
+        $result = $qb->select('*')->from('tx_ameosscim_access')->executeQuery();
         while ($access = $result->fetchAssociative()) {
             if ($hashInstance->checkPassword($secret, $access['secret'])) {
                 return true;

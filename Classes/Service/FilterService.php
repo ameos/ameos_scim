@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Ameos\Scim\Service;
+namespace Ameos\AmeosScim\Service;
 
-use Ameos\Scim\Exception\BadRequestException;
+use Ameos\AmeosScim\Exception\BadRequestException;
 use Tmilos\Lexer\Error\UnknownTokenException;
 use Tmilos\ScimFilterParser\Ast\ComparisonExpression;
 use Tmilos\ScimFilterParser\Ast\Conjunction;

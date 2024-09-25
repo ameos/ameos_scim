@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
-namespace Ameos\Scim\Service;
+namespace Ameos\AmeosScim\Service;
 
-use Ameos\Scim\Domain\Repository\AbstractResourceRepository;
-use Ameos\Scim\Domain\Repository\BackendGroupRepository;
-use Ameos\Scim\Domain\Repository\FrontendGroupRepository;
-use Ameos\Scim\Enum\Context;
-use Ameos\Scim\Enum\PostPersistMode;
-use Ameos\Scim\Enum\ResourceType;
-use Ameos\Scim\Event\PostDeleteGroupEvent;
-use Ameos\Scim\Event\PostPersistGroupEvent;
+use Ameos\AmeosScim\Domain\Repository\AbstractResourceRepository;
+use Ameos\AmeosScim\Domain\Repository\BackendGroupRepository;
+use Ameos\AmeosScim\Domain\Repository\FrontendGroupRepository;
+use Ameos\AmeosScim\Enum\Context;
+use Ameos\AmeosScim\Enum\PostPersistMode;
+use Ameos\AmeosScim\Enum\ResourceType;
+use Ameos\AmeosScim\Event\PostDeleteGroupEvent;
+use Ameos\AmeosScim\Event\PostPersistGroupEvent;
 use Psr\EventDispatcher\EventDispatcherInterface;
 
 class GroupService

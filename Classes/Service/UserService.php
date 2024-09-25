@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
-namespace Ameos\Scim\Service;
+namespace Ameos\AmeosScim\Service;
 
-use Ameos\Scim\Domain\Repository\AbstractResourceRepository;
-use Ameos\Scim\Domain\Repository\BackendUserRepository;
-use Ameos\Scim\Domain\Repository\FrontendUserRepository;
-use Ameos\Scim\Enum\Context;
-use Ameos\Scim\Enum\PostPersistMode;
-use Ameos\Scim\Enum\ResourceType;
-use Ameos\Scim\Event\PostDeleteUserEvent;
-use Ameos\Scim\Event\PostPersistUserEvent;
+use Ameos\AmeosScim\Domain\Repository\AbstractResourceRepository;
+use Ameos\AmeosScim\Domain\Repository\BackendUserRepository;
+use Ameos\AmeosScim\Domain\Repository\FrontendUserRepository;
+use Ameos\AmeosScim\Enum\Context;
+use Ameos\AmeosScim\Enum\PostPersistMode;
+use Ameos\AmeosScim\Enum\ResourceType;
+use Ameos\AmeosScim\Event\PostDeleteUserEvent;
+use Ameos\AmeosScim\Event\PostPersistUserEvent;
 use Psr\EventDispatcher\EventDispatcherInterface;
 
 class UserService

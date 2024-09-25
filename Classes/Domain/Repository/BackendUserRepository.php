@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Ameos\Scim\Domain\Repository;
+namespace Ameos\AmeosScim\Domain\Repository;
 
 use Doctrine\DBAL\Result;
 

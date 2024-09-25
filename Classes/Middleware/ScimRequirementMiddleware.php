@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Ameos\Scim\Middleware;
+namespace Ameos\AmeosScim\Middleware;
 
-use Ameos\Scim\Enum\Context;
+use Ameos\AmeosScim\Enum\Context;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
@@ -30,7 +30,7 @@ class ScimRequirementMiddleware implements MiddlewareInterface
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        $config = $this->extensionConfiguration->get('scim');
+        $config = $this->extensionConfiguration->get('ameos_scim');
 
         if (
             (bool)$config['be_activation'] === true

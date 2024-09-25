@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Ameos\Scim\Controller;
+namespace Ameos\AmeosScim\Controller;
 
-use Ameos\Scim\Enum\Context;
-use Ameos\Scim\Exception\NoResourceFoundException;
-use Ameos\Scim\Service\GroupService;
+use Ameos\AmeosScim\Enum\Context;
+use Ameos\AmeosScim\Exception\NoResourceFoundException;
+use Ameos\AmeosScim\Service\GroupService;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;

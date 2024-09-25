@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Ameos\Scim\Domain\Repository\Traits;
+namespace Ameos\AmeosScim\Domain\Repository\Traits;
 
 use Doctrine\DBAL\Result;
 use TYPO3\CMS\Core\Database\Connection;

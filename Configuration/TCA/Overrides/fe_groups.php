@@ -8,14 +8,14 @@ ExtensionManagementUtility::addTCAcolumns(
     'fe_groups',
     [
         'scim_id' => [
-            'label'  => 'LLL:EXT:scim/Resources/Private/Language/locallang.xlf:scim_id',
+            'label'  => 'LLL:EXT:ameos_scim/Resources/Private/Language/locallang.xlf:scim_id',
             'config' => [
                 'type' => 'uuid',
                 'version' => 6,
             ],
         ],
         'scim_external_id' => [
-            'label'  => 'LLL:EXT:scim/Resources/Private/Language/locallang.xlf:scim_external_id',
+            'label'  => 'LLL:EXT:ameos_scim/Resources/Private/Language/locallang.xlf:scim_external_id',
             'config' => [
                 'type' => 'input',
                 'readOnly' => true,
@@ -26,5 +26,5 @@ ExtensionManagementUtility::addTCAcolumns(
 
 ExtensionManagementUtility::addToAllTCAtypes(
     'fe_groups',
-    '--div--;LLL:EXT:scim/Resources/Private/Language/locallang.xlf:scim,scim_id,scim_external_id'
+    '--div--;LLL:EXT:ameos_scim/Resources/Private/Language/locallang.xlf:scim,scim_id,scim_external_id'
 );

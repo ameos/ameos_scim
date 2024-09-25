@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Ameos\Scim\Registry;
+namespace Ameos\AmeosScim\Registry;
 
-use Ameos\Scim\Enum\ResourceType;
-use Ameos\Scim\Exception\RegistryItemNotFoundException;
+use Ameos\AmeosScim\Enum\ResourceType;
+use Ameos\AmeosScim\Exception\RegistryItemNotFoundException;
 use TYPO3\CMS\Core\SingletonInterface;
 
 class BulkIdRegistry implements SingletonInterface

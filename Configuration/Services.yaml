@@ -4,41 +4,47 @@ services:
     autoconfigure: true
     public: false
 
-  Ameos\Scim\:
+  Ameos\AmeosScim\:
     resource: '../Classes/*'
 
-  Ameos\Scim\Controller\UserController:
+  Ameos\AmeosScim\Controller\UserController:
     public: true
 
-  Ameos\Scim\Controller\GroupController:
+  Ameos\AmeosScim\Controller\GroupController:
     public: true
 
-  Ameos\Scim\Controller\BulkController:
+  Ameos\AmeosScim\Controller\BulkController:
     public: true
 
-  Ameos\Scim\Controller\SchemaController:
+  Ameos\AmeosScim\Controller\SchemaController:
     public: true
 
-  Ameos\Scim\CustomObject\GroupObject:
+  Ameos\AmeosScim\CustomObject\GroupObject:
     public: true
 
-  Ameos\Scim\CustomObject\MultiValuedObject:
+  Ameos\AmeosScim\CustomObject\MultiValuedObject:
     public: true
 
-  Ameos\Scim\CustomObject\MemberObject:
+  Ameos\AmeosScim\CustomObject\MemberObject:
     public: true
 
-  Ameos\Scim\EventListener\ProcessMembersAfterGroupPersist:
+  Ameos\AmeosScim\EventListener\ProcessMembersAfterGroupPersist:
     tags:
       - name: event.listener
         identifier: 'scim/process-members'
 
-  Ameos\Scim\EventListener\CleanUsersAfterGroupRemoved:
+  Ameos\AmeosScim\EventListener\CleanUsersAfterGroupRemoved:
     tags:
       - name: event.listener
         identifier: 'scim/clean-users'
 
-  Ameos\Scim\EventListener\CleanGroupsAfterGroupRemoved:
+  Ameos\AmeosScim\EventListener\CleanGroupsAfterGroupRemoved:
     tags:
       - name: event.listener
         identifier: 'scim/clean-groups'
+
+  Ameos\AmeosScim\ConfigurationModuleProvider\ScimConfigurationProvider:       
+    tags:
+      - name: 'lowlevel.configuration.module.provider'
+        identifier: 'scimConfigurationProvider'
+        label: 'LLL:EXT:ameos_scim/Resources/Private/Language/locallang.xlf:scimConfigurationProvider'

@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Ameos\Scim\Test;
+namespace Ameos\AmeosScim\Test;
 
-use Ameos\Scim\Service\FilterService;
-use Ameos\Scim\Service\MappingService;
+use Ameos\AmeosScim\Service\FilterService;
+use Ameos\AmeosScim\Service\MappingService;
 use Doctrine\DBAL\Query\QueryBuilder as DoctrineQueryBuilder;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;

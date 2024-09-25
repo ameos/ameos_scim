@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Ameos\Scim\Test\Mapping;
+namespace Ameos\AmeosScim\Test\Mapping;
 
-use Ameos\Scim\CustomObject\MultiValuedObject;
-use Ameos\Scim\Enum\Context;
-use Ameos\Scim\Service\MappingService;
+use Ameos\AmeosScim\CustomObject\MultiValuedObject;
+use Ameos\AmeosScim\Enum\Context;
+use Ameos\AmeosScim\Service\MappingService;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use TYPO3\TestingFramework\Core\Unit\UnitTestCase;

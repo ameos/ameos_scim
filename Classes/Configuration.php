@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Ameos\Scim;
+namespace Ameos\AmeosScim;
 
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\PathUtility;

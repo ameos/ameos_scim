@@ -18,7 +18,7 @@ scim:
           cast: bool
           toggle: true
         emails:
-          object: Ameos\Scim\CustomObject\MultiValuedObject
+          object: Ameos\AmeosScim\CustomObject\MultiValuedObject
           arguments:
             - primary:
                 value: true
